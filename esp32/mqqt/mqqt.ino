@@ -18,14 +18,19 @@ const int mqtt_port = 1883;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-const int LED = 2;  //встроенный светодиод (вывод I/O 2)
+// const int LED = 2;  //встроенный светодиод (вывод I/O 2)
+
+unsigned long lastMsg = 0;
+const long interval = 1000; // 1 секунда
+unsigned long accumulator = 0;
+char buf[100];
 
 void setup() {
   // Set software serial baud to 115200;
   Serial.begin(115200);
 
-  pinMode(LED, OUTPUT);
-  digitalWrite(LED, HIGH);
+  // pinMode(LED, OUTPUT);
+  // digitalWrite(LED, HIGH);
   // Connecting to a WiFi network
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -49,35 +54,44 @@ void setup() {
     }
   }
   // Publish and subscribe
-  client.publish(topic, "Test topic");
   client.subscribe(topic);
 }
 
 void callback(char *topic, byte *payload, unsigned int length) {
-  Serial.print("Message arrived in topic: ");
-  Serial.println(topic);
-  Serial.print("Message:");
-  String message;
+  // Serial.print("Message arrived in topic: ");
+  // Serial.println(topic);
+  // Serial.print("Message:");
+  // String message;
   
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-    message += (char)payload[i];
-  }
-  Serial.println();
-  Serial.println("-----------------------");
+  // for (int i = 0; i < length; i++) {
+  //   Serial.print((char)payload[i]);
+  //   message += (char)payload[i];
+  // }
+  // Serial.println();
+  // Serial.println("-----------------------");
 
-  if (String(topic) == "test") {
-    Serial.print("Changing output to ");
-    if (message == "on") {
-      Serial.println("on");
-      digitalWrite(LED, HIGH);
-    } else if (message == "off") {
-      Serial.println("off");
-      digitalWrite(LED, LOW);
-    }
-  }
+  // if (String(topic) == "test") {
+  //   Serial.print("Changing output to ");
+  //   if (message == "on") {
+  //     Serial.println("on");
+  //     digitalWrite(LED, HIGH);
+  //   } else if (message == "off") {
+  //     Serial.println("off");
+  //     digitalWrite(LED, LOW);
+  //   }
+  // }
 }
 
 void loop() {
   client.loop();
+
+  unsigned long now = millis();
+  if (now - lastMsg > interval) {
+    lastMsg = now;
+    
+    itoa(accumulator, buf, 10);
+    client.publish("test-2", buf);
+    accumulator = accumulator + 1;
+    buf[0] = 0;
+  }
 }
