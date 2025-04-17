@@ -1,4 +1,4 @@
 FROM eclipse-mosquitto:2
-WORKDIR /mosquitto
+WORKDIR /broker
 COPY . .
 EXPOSE 1883

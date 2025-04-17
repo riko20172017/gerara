@@ -2,11 +2,10 @@ const express = require("express"); // подключаем фреймворк E
 const mqtt = require("mqtt");
 
 const protocol = "mqtt";
-const host = "178.208.65.214";
 const portMqtt = "1883";
 const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
 
-const connectUrl = `${protocol}://${host}:${portMqtt}`;
+const connectUrl = `${protocol}://broker:${portMqtt}`;
 
 const client = mqtt.connect(connectUrl, {
   clientId,
@@ -28,7 +27,7 @@ const app = express(); // создаем экземпляр приложения
 const router = express.Router(); // создаем экземпляр роутера
 
 const path = __dirname; // записываем путь до рабочего каталога
-const port = 8080; // записываем порт сервера
+const port = 8000; // записываем порт сервера
 
 // выводим в консоль HTTP METHOD при каждом запросе
 router.use(function (req, res, next) {
@@ -56,5 +55,5 @@ app.use("/", router);
 
 // начинаем прослушивать порт 8080, тем самым запуская http-сервер
 app.listen(port, function () {
-  console.log("Listening on port 8080");
+  console.log("Listening on port 8000");
 });
