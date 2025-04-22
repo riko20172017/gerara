@@ -1,11 +1,38 @@
+const { WebSocketServer } = require("ws");
 const express = require("express"); // подключаем фреймворк Express (модуль)
+const redis = require('redis');
 const mqtt = require("mqtt");
 
+const redisClient = redis.createClient({
+  host: 'redis',
+  port: 6379
+});
+
+redisClient.on('error', (err) => {
+  console.log('Error occured while connecting or accessing redis server');
+})
+
+// const http = require("http");
+// const uuidv4 = require("uuid").v4;
+
+const wss = new WebSocketServer({ port: 7000 });
+
+wss.on('connection', function connection(ws) {
+  ws.on('error', console.error);
+
+  ws.on('message', function message(data) {
+    console.log('received: %s', data);
+  });
+
+  ws.send('something');
+});
+
+const broker = process.env.BROKER_IP;
 const protocol = "mqtt";
 const portMqtt = "1883";
 const clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
 
-const connectUrl = `${protocol}://broker:${portMqtt}`;
+const connectUrl = `${protocol}://${broker}:${portMqtt}`;
 
 const client = mqtt.connect(connectUrl, {
   clientId,
@@ -40,6 +67,17 @@ router.get("/", function (req, res) {
   res.sendFile(path + "/index.html");
 });
 router.get("/onoff", (req, res) => {
+  console.log(req.query.action);
+
+  client.publish("test", req.query.action, { qos: 0, retain: false }, (error) => {
+    if (error) {
+      console.error(error);
+    }
+  });
+  res.send("Get an existing workout");
+});
+
+router.get("/valve/set/timer", (req, res) => {
   console.log(req.query.action);
 
   client.publish("test", req.query.action, { qos: 0, retain: false }, (error) => {

@@ -5,8 +5,10 @@ services:
       dockerfile: Dockerfile
       target: production
     image: riko2018/iot-client
+    env_file: ./.env.cli.prod
+    container_name: cli
     ports:
-      - "7000:7000"
+      - "3000:3000"
     volumes:
       - ./client:/app
       - ./client/node_modules:/app/node_modules
@@ -18,10 +20,12 @@ services:
       dockerfile: Dockerfile
       target: production
     image: riko2018/iot-api
+    env_file: ./.env.api.prod
     container_name: api
     restart: always
     ports:
       - '8000:8000'
+      - '7000:7000'
     volumes:
       - ./api:/api
       - /api/node_modules
@@ -38,3 +42,7 @@ services:
       - ./broker/config:/mosquitto/config
       - ./broker/data:/mosquitto/data
       - ./broker/log:/mosquitto/log
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - '6379:6379'

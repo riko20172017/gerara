@@ -5,7 +5,8 @@ services:
       dockerfile: Dockerfile
       target: development
     #image: riko2018/iot-client
-    container_name: client
+    env_file: ./.env.cli.deve
+    container_name: cli
     ports:
       - "3000:3000"
     volumes:
@@ -14,18 +15,20 @@ services:
     stdin_open: true
     tty: true
   api:
-    build: 
+    build:
       context: ./api
       dockerfile: Dockerfile
       target: development
     #image: riko2018/iot-api
+    env_file: ./.env.api.deve
     container_name: api
     restart: always
     ports:
       - '8000:8000'
+      - '7000:7000'
     volumes:
       - ./api:/api
-      - /api/node_modules
+      - ./api/node_modules:/api/node_modules
     depends_on:
       broker:
         condition: service_started
@@ -39,3 +42,8 @@ services:
       - ./broker/config:/mosquitto/config
       - ./broker/data:/mosquitto/data
       - ./broker/log:/mosquitto/log
+  redis:
+    image: 'redis:alpine'
+    container_name: redis
+    ports:
+      - '6379:6379'

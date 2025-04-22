@@ -8,7 +8,6 @@ COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
 # Copy the rest of the application code and build for production
 COPY . ./
-ENV REACT_APP_API_URL=http://185.221.155.147:8000
 RUN npm run build
 
 # Stage 2: Development environment -------------------------------------------
@@ -16,7 +15,6 @@ FROM node:18-alpine AS development
 WORKDIR /app
 # Install dependencies again for development
 COPY package.json package-lock.json ./
-ENV REACT_APP_API_URL=http://localhost:8000
 RUN npm install --frozen-lockfile
 COPY . ./
 # Expose port for the development server

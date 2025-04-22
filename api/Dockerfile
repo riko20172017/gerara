@@ -4,16 +4,16 @@ FROM node:19-alpine as development
 RUN npm install -g nodemon
 WORKDIR /api
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --frozen-lockfile
 COPY . ./
-EXPOSE $PORT
+EXPOSE $PORT 7000
 CMD ["npm", "run", "dev"]
 
 FROM node:19-alpine as production
 RUN npm install -g nodemon
 WORKDIR /api
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --frozen-lockfile
 COPY . ./
-EXPOSE $PORT
+EXPOSE $PORT 7000
 CMD ["npm", "run", "start"]
