@@ -1,3 +1,5 @@
+ARG PORT=3000
+
 # Stage 1: Build the React app
 FROM node:18-alpine AS build
 
@@ -25,7 +27,7 @@ RUN npm install --frozen-lockfile
 COPY . ./
 
 # Expose port for the development server
-EXPOSE 3000
+EXPOSE $PORT
 CMD ["npm", "start"]
 
 # Stage 3: Production environment --------------------------------
@@ -35,5 +37,5 @@ FROM nginx:alpine AS production
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Expose the default NGINX port
-EXPOSE 80
+EXPOSE $PORT
 CMD ["nginx", "-g", "daemon off;"]
