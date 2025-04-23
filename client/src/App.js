@@ -26,7 +26,7 @@ function App() {
 
   // Run when a new WebSocket message is received (lastJsonMessage)
   useEffect(() => {
-    console.log(`Got a new message: ${lastJsonMessage}`)
+    console.log(`Got a new message: ${JSON.stringify(lastJsonMessage)}`)
   }, [lastJsonMessage])
 
   return (
