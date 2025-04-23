@@ -24,7 +24,7 @@ wss.on('connection', function connection(ws) {
     console.log('received: %s', data);
   });
 
-  let interval = setInterval(() => getSelPos(ws), 1000);
+  let interval = setInterval(() => getSelPos(ws), 10000);
 });
 
 const getSelPos = async (ws) => {

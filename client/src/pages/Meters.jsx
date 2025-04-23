@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
 export default function Meters() {
-  const WS_URL = "ws://localhost:7000";
+  const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     WS_URL,
     {
