@@ -4,7 +4,7 @@ services:
     container_name: cli
     restart: always
     ports:
-      - "3000:3000"
+      - "3000:80"
     stdin_open: true
     tty: true
   api:

@@ -3,10 +3,8 @@ ARG PORT=3000
 # Stage 1: Build the React app
 FROM node:18-alpine AS build
 WORKDIR /app
-# Leverage caching by installing dependencies first
 COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
-# Copy the rest of the application code and build for production
 COPY . ./
 RUN npm run build
 
@@ -17,14 +15,15 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
 COPY . ./
-# Expose port for the development server
 EXPOSE $PORT
+ENV REACT_APP_API_IP=127.0.0.1
+ENV REACT_APP_API_PORT=8000
 CMD ["npm", "start"]
 
 # Stage 3: Production environment --------------------------------
 FROM nginx:alpine AS production
-# Copy the production build artifacts from the build stage
 COPY --from=build /app/build /usr/share/nginx/html
-# Expose the default NGINX port
 EXPOSE $PORT
+ENV REACT_APP_API_IP=185.221.155.147
+ENV REACT_APP_API_PORT=8000
 CMD ["nginx", "-g", "daemon off;"]
