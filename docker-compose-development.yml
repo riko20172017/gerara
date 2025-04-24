@@ -1,15 +1,15 @@
 services:
-  client:
+  cli:
     build:
-      context: ./client
+      context: ./cli
       dockerfile: Dockerfile
       target: development
     container_name: cli
     ports:
       - "3000:3000"
     volumes:
-      - ./client:/app
-      - /app/node_modules
+      - ./cli:/cli
+      - /cli/node_modules
     stdin_open: true
     tty: true
   api:
