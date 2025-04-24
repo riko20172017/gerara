@@ -21,7 +21,7 @@ services:
         condition: service_started
   broker:
     container_name: broker
-    image: riko2018/iot-brocker
+    image: eclipse-mosquitto
     ports:
       - 1883:1883
     volumes:

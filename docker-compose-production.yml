@@ -5,45 +5,9 @@ services:
       dockerfile: Dockerfile
       target: production
     image: riko2018/iot-client
-    env_file: ./.env.cli.prod
-    container_name: cli
-    ports:
-      - "3000:3000"
-    stdin_open: true
-    tty: true
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
       target: production
     image: riko2018/iot-api
-    env_file: ./.env.api.prod
-    container_name: api
-    restart: always
-    ports:
-      - '8000:8000'
-      - '7000:7000'
-    depends_on:
-      broker:
-        condition: service_started
-      mongo:
-        condition: service_started
-  broker:
-    build: ./broker
-    container_name: broker
-    image: riko2018/iot-brocker
-    ports:
-      - 1883:1883
-    volumes:
-      - ./broker/config:/mosquitto/config
-      - ./broker/data:/mosquitto/data
-      - ./broker/log:/mosquitto/log
-  mongo:
-    ports:
-      - "27017:27017"
-    image: mongo
-    container_name: mongo
-    volumes:
-      - mongo:/data/db
-volumes:
-  mongo:
