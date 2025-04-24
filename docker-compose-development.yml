@@ -4,10 +4,12 @@ services:
       context: ./client
       dockerfile: Dockerfile
       target: development
-    container_name: dev-cli
-    restart: always
+    container_name: cli
     ports:
       - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
     stdin_open: true
     tty: true
   api:
@@ -15,11 +17,14 @@ services:
       context: ./api
       dockerfile: Dockerfile
       target: development
-    container_name: dev-api
+    container_name: api
     restart: always
     ports:
       - '8000:8000'
       - '7000:7000'
+    volumes:
+      - ./api:/api
+      - /api/node_modules
     depends_on:
       broker:
         condition: service_started
