@@ -1,15 +1,21 @@
 services:
   client:
-    image: riko2018/iot-client
-    container_name: cli
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: development
+    container_name: dev-cli
     restart: always
     ports:
-      - "3000:80"
+      - "3000:3000"
     stdin_open: true
     tty: true
   api:
-    image: riko2018/iot-api
-    container_name: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: development
+    container_name: dev-api
     restart: always
     ports:
       - '8000:8000'
@@ -20,7 +26,8 @@ services:
       mongo:
         condition: service_started
   broker:
-    image: eclipse-mosquitto:2
+    image: eclipse-mosquitto
+    container_name: broker
     ports:
       - 1883:1883
     volumes:

@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
 COPY . ./
+ENV REACT_APP_API_IP=185.221.155.147
+ENV REACT_APP_API_PORT=8000
 RUN npm run build
 
 # Stage 2: Development environment -------------------------------------------
@@ -24,6 +26,4 @@ CMD ["npm", "start"]
 FROM nginx:alpine AS production
 COPY --from=build /app/build /usr/share/nginx/html
 EXPOSE $PORT
-ENV REACT_APP_API_IP=185.221.155.147
-ENV REACT_APP_API_PORT=8000
 CMD ["nginx", "-g", "daemon off;"]
