@@ -20,7 +20,7 @@ services:
       mongo:
         condition: service_started
   broker:
-    #image: riko2018/iot-brocker
+    image: eclipse-mosquitto:2
     ports:
       - 1883:1883
     volumes:
