@@ -2,7 +2,7 @@ ARG PORT=3000
 
 # Stage 1: Build the React app
 FROM node:18-alpine AS build
-WORKDIR /app
+WORKDIR /cli
 COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
 COPY . ./
@@ -12,7 +12,7 @@ RUN npm run build
 
 # Stage 2: Development environment -------------------------------------------
 FROM node:18-alpine AS development
-WORKDIR /app
+WORKDIR /cli
 # Install dependencies again for development
 COPY package.json package-lock.json ./
 RUN npm install --frozen-lockfile
@@ -24,6 +24,6 @@ CMD ["npm", "start"]
 
 # Stage 3: Production environment --------------------------------
 FROM nginx:alpine AS production
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /cli/build /usr/share/nginx/html
 EXPOSE $PORT
 CMD ["nginx", "-g", "daemon off;"]

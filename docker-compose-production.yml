@@ -1,6 +1,6 @@
 services:
-  client:
-    image: riko2018/iot-client
+  cli:
+    image: riko2018/iot-cli
     container_name: cli
     restart: always
     ports:

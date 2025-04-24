@@ -1,7 +1,7 @@
 services:
-  client:
+  cli:
     build:
-      context: ./client
+      context: ./cli
       dockerfile: Dockerfile
       target: production
     image: riko2018/iot-client

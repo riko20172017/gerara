@@ -22,10 +22,11 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', function message(data) {
     console.log('received: %s', data);
+    
+
   });
 
   getSelPos(ws);
-  
   let interval = setInterval(() => getSelPos(ws), 10000);
 });
 
