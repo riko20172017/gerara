@@ -80,7 +80,15 @@ const getMetersData = async (ws) => {
     .limit(1)
     .toArray();
 
-  ws.send(JSON.stringify([].concat(h1, h2, h3, h4, h5)));
+  const data = [
+    { name: 1, value: h1 ? parseInt(h1[0].value) : 0 },
+    { name: 2, value: h2 ? parseInt(h2[0].value) : 0 },
+    { name: 3, value: h3 ? parseInt(h3[0].value) : 0 },
+    { name: 4, value: h4 ? parseInt(h4[0].value) : 0 },
+    { name: 5, value: h4 ? parseInt(h4[0].value) : 0 },
+  ];
+
+  ws.send(JSON.stringify({ event: "get/meters/data/response", data }));
 };
 
 const getValvesData = async (ws) => {
@@ -150,7 +158,6 @@ broker.on("connect", () => {
 });
 
 broker.on("message", (topic, message) => {
-  console.log(topic);
 
   if (topic == "humidity1") {
     db.collection("humidity1").insertOne({
@@ -188,16 +195,20 @@ broker.on("message", (topic, message) => {
     topic == "vk3o" ||
     topic == "vk4o"
   ) {
-    handleValve(topic, message);
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        handleValve(client, topic, message);
+      }
+    });
   }
 });
 
-function handleValve(topic, message) {
+function handleValve(ws, topic, message) {
   const name = topic.slice(2, 3);
   const time = message.toString();
 
+  ws.send(JSON.stringify({ event: "valve/time", data: { name, time } }));
   db.collection("valves").insertOne({ name, time });
-  wss.emit(JSON.stringify({ event: "set/valve/time/response", time }));
 }
 
 broker.on("error", (error) => {

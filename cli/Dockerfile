@@ -4,7 +4,7 @@ ARG PORT=3000
 FROM node:18-alpine AS build
 WORKDIR /cli
 COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile
+RUN npm install --frozen-lockfile && npm cache clean --force
 COPY . ./
 ENV REACT_APP_API_IP=185.221.155.147
 ENV REACT_APP_API_PORT=8000

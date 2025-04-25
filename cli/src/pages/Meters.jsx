@@ -4,12 +4,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 export default function Meters() {
   const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
-    WS_URL,
-    {
-      share: false,
-      shouldReconnect: () => true,
-    }
-  );
+    WS_URL, { share: false, shouldReconnect: () => true });
 
   const [meters, setMeters] = useState([]);
 
@@ -18,9 +13,6 @@ export default function Meters() {
     if (readyState === ReadyState.OPEN) {
       sendJsonMessage({
         event: "get/meters/data/request",
-        data: {
-          channel: "meters-data",
-        },
       });
     }
   }, [readyState]);
@@ -28,7 +20,9 @@ export default function Meters() {
   // Handle incoming WebSocket messages
   useEffect(() => {
     if (lastJsonMessage) {
-      setMeters(lastJsonMessage); // Assuming the response is an array of objects
+      if (lastJsonMessage.event === "get/meters/data/response") {
+        setMeters([...lastJsonMessage.data]);
+      }
     }
   }, [lastJsonMessage]);
 
