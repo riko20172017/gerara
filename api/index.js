@@ -29,7 +29,7 @@ wss.on("connection", function connection(ws) {
 
     if (res.event == "set/valve/time/request") {
       broker.publish(
-        "vk" + res.data.valve,
+        "vk" + res.data.name,
         JSON.stringify(res.data.time),
         { qos: 0, retain: false },
         (error) => {
@@ -118,10 +118,10 @@ const getValvesData = async (ws) => {
     .toArray();
 
   const data = [
-    { valve: 1, time: v1.length ? parseInt(v1[0].time) : 0 },
-    { valve: 2, time: v2.length ? parseInt(v2[0].time) : 0 },
-    { valve: 3, time: v3.length ? parseInt(v3[0].time) : 0 },
-    { valve: 4, time: v4.length ? parseInt(v4[0].time) : 0 },
+    { name: 1, time: v1.length ? parseInt(v1[0].time) : 0 },
+    { name: 2, time: v2.length ? parseInt(v2[0].time) : 0 },
+    { name: 3, time: v3.length ? parseInt(v3[0].time) : 0 },
+    { name: 4, time: v4.length ? parseInt(v4[0].time) : 0 },
   ];
 
   ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
@@ -159,7 +159,6 @@ broker.on("connect", () => {
 });
 
 broker.on("message", (topic, message) => {
-
   if (topic == "humidity1") {
     db.collection("humidity1").insertOne({
       name: "humidity1",
@@ -205,8 +204,8 @@ broker.on("message", (topic, message) => {
 });
 
 function handleValve(ws, topic, message) {
-  const name = topic.slice(2, 3);
-  const time = message.toString();
+  const name = parseInt(topic.slice(2, 3));
+  const time = parseInt(message.toString());
 
   ws.send(JSON.stringify({ event: "valve/time", data: { name, time } }));
   db.collection("valves").insertOne({ name, time });
