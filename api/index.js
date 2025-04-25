@@ -6,22 +6,20 @@ const mqtt = require("mqtt");
 let db;
 let broker;
 const mongoc = new MongoClient(`mongodb://mongo:27017/`);
-mongoc.connect().then(mc => {
+mongoc.connect().then((mc) => {
   console.log("Подключение к mongo установлено");
   db = mc.db("gerara");
-
 });
 
-
-// const http = require("http"); 
+// const http = require("http");
 // const uuidv4 = require("uuid").v4;
 
 const wss = new WebSocketServer({ port: 7000 });
 
-wss.on('connection', function connection(ws) {
-  ws.on('error', console.error);
+wss.on("connection", function connection(ws) {
+  ws.on("error", console.error);
 
-  ws.on('message', function message(r) {
+  ws.on("message", function message(r) {
     res = JSON.parse(r);
 
     if (res.event == "get/valves/time/request") {
@@ -30,48 +28,95 @@ wss.on('connection', function connection(ws) {
     }
 
     if (res.event == "set/valve/time/request") {
-      broker.publish("vk" + res.data.valve, JSON.stringify(res.data.time), { qos: 0, retain: false }, (error) => {
-        if (error) {
-          console.error("brocker publish fail", error);
+      broker.publish(
+        "vk" + res.data.valve,
+        JSON.stringify(res.data.time),
+        { qos: 0, retain: false },
+        (error) => {
+          if (error) {
+            console.error("brocker publish fail", error);
+          }
         }
-      })
+      );
     }
 
-    if (res.event == "getMetersData") {
+    if (res.event == "get/meters/data/request") {
       getMetersData(ws);
       let interval = setInterval(() => getMetersData(ws), 10000);
     }
-
   });
-
-
 });
 
 const getMetersData = async (ws) => {
   // name value
-  const h1 = await db.collection("humidity1").find().sort({ _id: -1 }).limit(1).toArray()
-  const h2 = await db.collection("humidity2").find().sort({ _id: -1 }).limit(1).toArray()
-  const h3 = await db.collection("humidity3").find().sort({ _id: -1 }).limit(1).toArray()
-  const h4 = await db.collection("humidity4").find().sort({ _id: -1 }).limit(1).toArray()
-  const h5 = await db.collection("humidity5").find().sort({ _id: -1 }).limit(1).toArray()
+  const h1 = await db
+    .collection("humidity1")
+    .find()
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+  const h2 = await db
+    .collection("humidity2")
+    .find()
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+  const h3 = await db
+    .collection("humidity3")
+    .find()
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+  const h4 = await db
+    .collection("humidity4")
+    .find()
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+  const h5 = await db
+    .collection("humidity5")
+    .find()
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
 
-  ws.send(JSON.stringify([].concat(h1, h2, h3, h4, h5)))
-}
+  ws.send(JSON.stringify([].concat(h1, h2, h3, h4, h5)));
+};
 
 const getValvesData = async (ws) => {
-  const v1 = await db.collection("valves").find({ name: "1" }).sort({ _id: -1 }).limit(1).toArray()
-  const v2 = await db.collection("valves").find({ name: "2" }).sort({ _id: -1 }).limit(1).toArray()
-  const v3 = await db.collection("valves").find({ name: "3" }).sort({ _id: -1 }).limit(1).toArray()
-  const v4 = await db.collection("valves").find({ name: "4" }).sort({ _id: -1 }).limit(1).toArray()
+  const v1 = await db
+    .collection("valves")
+    .find({ name: "1" })
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+  const v2 = await db
+    .collection("valves")
+    .find({ name: "2" })
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+  const v3 = await db
+    .collection("valves")
+    .find({ name: "3" })
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
+  const v4 = await db
+    .collection("valves")
+    .find({ name: "4" })
+    .sort({ _id: -1 })
+    .limit(1)
+    .toArray();
   const data = [
     { valve: 1, time: v1 ? parseInt(v1[0].time) : 0 },
     { valve: 2, time: v2 ? parseInt(v2[0].time) : 0 },
     { valve: 3, time: v3 ? parseInt(v3[0].time) : 0 },
     { valve: 4, time: v4 ? parseInt(v4[0].time) : 0 },
-  ]
+  ];
 
-  ws.send(JSON.stringify({ event: "get/valves/time/response", data }))
-}
+  ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
+};
 
 const brokerIp = process.env.BROKER_IP;
 const protocol = "mqtt";
@@ -104,25 +149,45 @@ broker.on("connect", () => {
   }
 });
 
-broker.on('message', (topic, message) => {
+broker.on("message", (topic, message) => {
   console.log(topic);
-  
+
   if (topic == "humidity1") {
-    db.collection("humidity1").insertOne({ name: "humidity1", value: message.toString() });
+    db.collection("humidity1").insertOne({
+      name: "humidity1",
+      value: message.toString(),
+    });
   }
   if (topic == "humidity2") {
-    db.collection("humidity2").insertOne({ name: "humidity2", value: message.toString() });
+    db.collection("humidity2").insertOne({
+      name: "humidity2",
+      value: message.toString(),
+    });
   }
   if (topic == "humidity3") {
-    db.collection("humidity3").insertOne({ name: "humidity3", value: message.toString() });
+    db.collection("humidity3").insertOne({
+      name: "humidity3",
+      value: message.toString(),
+    });
   }
   if (topic == "humidity4") {
-    db.collection("humidity4").insertOne({ name: "humidity4", value: message.toString() });
+    db.collection("humidity4").insertOne({
+      name: "humidity4",
+      value: message.toString(),
+    });
   }
   if (topic == "humidity5") {
-    db.collection("humidity5").insertOne({ name: "humidity5", value: message.toString() });
+    db.collection("humidity5").insertOne({
+      name: "humidity5",
+      value: message.toString(),
+    });
   }
-  if (topic == "vk1o" || topic == "vk2o" || topic == "vk3o" || topic == "vk4o") {
+  if (
+    topic == "vk1o" ||
+    topic == "vk2o" ||
+    topic == "vk3o" ||
+    topic == "vk4o"
+  ) {
     handleValve(topic, message);
   }
 });
@@ -159,22 +224,32 @@ router.get("/", function (req, res) {
 router.get("/onoff", (req, res) => {
   console.log(req.query.action);
 
-  broker.publish("test", req.query.action, { qos: 0, retain: false }, (error) => {
-    if (error) {
-      console.error(error);
+  broker.publish(
+    "test",
+    req.query.action,
+    { qos: 0, retain: false },
+    (error) => {
+      if (error) {
+        console.error(error);
+      }
     }
-  });
+  );
   res.send("Get an existing workout");
 });
 
 router.get("/valve/set/timer", (req, res) => {
   console.log(req.query.action);
 
-  broker.publish("test", req.query.action, { qos: 0, retain: false }, (error) => {
-    if (error) {
-      console.error(error);
+  broker.publish(
+    "test",
+    req.query.action,
+    { qos: 0, retain: false },
+    (error) => {
+      if (error) {
+        console.error(error);
+      }
     }
-  });
+  );
   res.send("Get an existing workout");
 });
 

@@ -17,7 +17,7 @@ export default function Meters() {
   useEffect(() => {
     if (readyState === ReadyState.OPEN) {
       sendJsonMessage({
-        event: "subscribe",
+        event: "get/meters/data/request",
         data: {
           channel: "meters-data",
         },
@@ -27,7 +27,7 @@ export default function Meters() {
 
   // Handle incoming WebSocket messages
   useEffect(() => {
-    if (lastJsonMessage && Array.isArray(lastJsonMessage)) {
+    if (lastJsonMessage) {
       setMeters(lastJsonMessage); // Assuming the response is an array of objects
     }
   }, [lastJsonMessage]);
