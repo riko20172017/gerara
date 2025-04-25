@@ -116,11 +116,12 @@ const getValvesData = async (ws) => {
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
+
   const data = [
-    { valve: 1, time: v1 ? parseInt(v1[0].time) : 0 },
-    { valve: 2, time: v2 ? parseInt(v2[0].time) : 0 },
-    { valve: 3, time: v3 ? parseInt(v3[0].time) : 0 },
-    { valve: 4, time: v4 ? parseInt(v4[0].time) : 0 },
+    { valve: 1, time: v1.length ? parseInt(v1[0].time) : 0 },
+    { valve: 2, time: v2.length ? parseInt(v2[0].time) : 0 },
+    { valve: 3, time: v3.length ? parseInt(v3[0].time) : 0 },
+    { valve: 4, time: v4.length ? parseInt(v4[0].time) : 0 },
   ];
 
   ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
