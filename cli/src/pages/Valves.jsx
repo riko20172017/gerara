@@ -48,24 +48,7 @@ function Valves() {
     }
   }, [message]);
 
-  // const handleTimeChange = (index, value) => {
-  //   setDisabled((prev) => {
-  //     const newDisabled = [...prev];
-  //     newDisabled[index] = false;
 
-  //     if (valves[index - 1].time == value) {
-  //       newDisabled[index] = true;
-  //     }
-  //     return newDisabled;
-  //   });
-  // };
-
-  // setDisabled((prev) => {
-  //   const newDisabled = [...prev];
-  //   newDisabled[index] = true;
-  //   return newDisabled;
-  // });
-  // };
 
   const handleClick = (name, time) => {
     send({
@@ -97,16 +80,16 @@ function Valves() {
             </li>
           ))}
         </ul>
-        {/* <div className="mt-4 text-center">
+        <div className="mt-4 text-center">
 					<h5>
 						Общее время полива:{" "}
-						{values.reduce(
-							(total, time) => total + time,
+						{valves.reduce(
+							(total, valve) => total + valve.time,
 							0
 						)}{" "}
 						минут
 					</h5>
-				</div> */}
+				</div>
       </div>
     </div>
   );

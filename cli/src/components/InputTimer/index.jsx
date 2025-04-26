@@ -24,7 +24,7 @@ const InputTimer = ({ avalue, itemId, handleClick }) => {
       <button
         className="btn btn-primary"
         onClick={() => handleClick(itemId, value)}
-        // disabled={disabled[valve]}
+        disabled={avalue === value}
       >
         Сохранить
       </button>

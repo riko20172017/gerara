@@ -123,9 +123,6 @@ const getValvesData = async (ws) => {
     { name: 4, time: v4.length ? parseInt(v4[0].time) : 0 },
   ];
 
-  console.log(data[3].time);
-  
-
   ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
 };
 
