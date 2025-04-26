@@ -23,7 +23,6 @@ wss.on("connection", function connection(ws) {
     res = JSON.parse(r);
 
     if (res.event == "get/valves/time/request") {
-      getValvesData(ws);
       setImmediate(() => getValvesData(ws));
     }
 
@@ -94,25 +93,25 @@ const getMetersData = async (ws) => {
 const getValvesData = async (ws) => {
   const v1 = await db
     .collection("valves")
-    .find({ name: "1" })
+    .find({ name: 1 })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
   const v2 = await db
     .collection("valves")
-    .find({ name: "2" })
+    .find({ name: 2 })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
   const v3 = await db
     .collection("valves")
-    .find({ name: "3" })
+    .find({ name: 3 })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
   const v4 = await db
     .collection("valves")
-    .find({ name: "4" })
+    .find({ name: 4 })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
@@ -123,6 +122,9 @@ const getValvesData = async (ws) => {
     { name: 3, time: v3.length ? parseInt(v3[0].time) : 0 },
     { name: 4, time: v4.length ? parseInt(v4[0].time) : 0 },
   ];
+
+  console.log(data[3].time);
+  
 
   ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
 };
@@ -208,7 +210,7 @@ function handleValve(ws, topic, message) {
   const time = parseInt(message.toString());
 
   ws.send(JSON.stringify({ event: "valve/time", data: { name, time } }));
-  db.collection("valves").insertOne({ name, time });
+  db.collection("valves").insertOne({ name, time }); 
 }
 
 broker.on("error", (error) => {
