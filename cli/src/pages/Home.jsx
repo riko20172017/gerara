@@ -13,6 +13,9 @@ const Home = () => {
                         <Link to="/valves">Клапаны</Link>
                     </li>
                     <li>
+                        <Link to="/periods">Периоды</Link>
+                    </li>
+                    <li>
                         <Link to="/meters">Датчики</Link>
                     </li>
                 </ul>

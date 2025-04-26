@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Pamps from "./pages/Pamps";
 import Valves from "./pages/Valves";
 import Meters from "./pages/Meters";
+import Periods from "./pages/Periods";
 import NoPage from "./pages/NoPage";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="pamps" element={<Pamps />} />
           <Route path="valves" element={<Valves />} />
           <Route path="meters" element={<Meters />} />
+          <Route path="periods" element={<Periods />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

@@ -154,40 +154,25 @@ broker.on("connect", () => {
     broker.subscribe("vk2o");
     broker.subscribe("vk3o");
     broker.subscribe("vk4o");
+    broker.subscribe("k.p");
   }
 });
 
 broker.on("message", (topic, message) => {
-  if (topic == "humidity1") {
-    db.collection("humidity1").insertOne({
-      name: "humidity1",
-      value: message.toString(),
+  if (
+    topic == "humidity1" ||
+    topic == "humidity2" ||
+    topic == "humidity3" ||
+    topic == "humidity4" ||
+    topic == "humidity5"
+  ) {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        handleHumidity(client, topic, message);
+      }
     });
   }
-  if (topic == "humidity2") {
-    db.collection("humidity2").insertOne({
-      name: "humidity2",
-      value: message.toString(),
-    });
-  }
-  if (topic == "humidity3") {
-    db.collection("humidity3").insertOne({
-      name: "humidity3",
-      value: message.toString(),
-    });
-  }
-  if (topic == "humidity4") {
-    db.collection("humidity4").insertOne({
-      name: "humidity4",
-      value: message.toString(),
-    });
-  }
-  if (topic == "humidity5") {
-    db.collection("humidity5").insertOne({
-      name: "humidity5",
-      value: message.toString(),
-    });
-  }
+
   if (
     topic == "vk1o" ||
     topic == "vk2o" ||
@@ -200,14 +185,43 @@ broker.on("message", (topic, message) => {
       }
     });
   }
+  
+  if (topic == "k.p") {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        handlePeriodCount(client, topic, message);
+      }
+    });
+  }
 });
+
+function handleHumidity(ws, topic, message) {
+  const name = parseInt(topic.slice(8, 9));
+  const value = parseInt(message.toString());
+
+  db.collection(topic).insertOne({
+    name: topic,
+    value: message.toString(),
+  });
+}
 
 function handleValve(ws, topic, message) {
   const name = parseInt(topic.slice(2, 3));
   const time = parseInt(message.toString());
 
   ws.send(JSON.stringify({ event: "valve/time", data: { name, time } }));
-  db.collection("valves").insertOne({ name, time }); 
+  db.collection("valves").insertOne({ name, time });
+}
+
+function handlePeriodCount(ws, topic, message) {
+  const value = parseInt(message);
+
+  const log = db.collection("periods").updateOne(
+    { name: "periods number" },
+    { $set: { value: value } }
+  );
+
+  ws.send(JSON.stringify({ event: "periods/number", data: value }));
 }
 
 broker.on("error", (error) => {
