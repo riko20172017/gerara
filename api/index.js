@@ -43,6 +43,24 @@ wss.on("connection", function connection(ws) {
       getMetersData(ws);
       let interval = setInterval(() => getMetersData(ws), 10000);
     }
+
+    if (res.event == "set/periods/number") {
+      broker.publish(
+        "k.p",
+        JSON.stringify(res.data),
+        { qos: 0, retain: false },
+        (error) => {
+          if (error) {
+            console.error("brocker publish fail", error);
+          }
+        }
+      );
+    }
+
+    if (res.event == "get/periods/request") {
+      getPeriodsData(ws);
+      let interval = setInterval(() => getMetersData(ws), 10000);
+    }
   });
 });
 
@@ -126,6 +144,18 @@ const getValvesData = async (ws) => {
   ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
 };
 
+const getPeriodsData = async (ws) => {
+  let data = await db.collection("periods").find().toArray();
+  data = {
+    length: data.shift().value,
+    periods: data.map(({ value }, i) => {
+      return { name: `${i + 1}`, value };
+    }),
+  };
+
+  ws.send(JSON.stringify({ event: "get/periods/response", data }));
+};
+
 const brokerIp = process.env.BROKER_IP;
 const protocol = "mqtt";
 const portMqtt = "1883";
@@ -185,7 +215,7 @@ broker.on("message", (topic, message) => {
       }
     });
   }
-  
+
   if (topic == "k.p") {
     wss.clients.forEach((client) => {
       if (client.readyState === 1) {
@@ -216,10 +246,9 @@ function handleValve(ws, topic, message) {
 function handlePeriodCount(ws, topic, message) {
   const value = parseInt(message);
 
-  const log = db.collection("periods").updateOne(
-    { name: "periods number" },
-    { $set: { value: value } }
-  );
+  const log = db
+    .collection("periods")
+    .updateOne({ name: "periods number" }, { $set: { value: value } });
 
   ws.send(JSON.stringify({ event: "periods/number", data: value }));
 }

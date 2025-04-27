@@ -4,8 +4,7 @@ import InputTimer from "../components/InputTimer";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function Valves() {
-  const [disabled, setDisabled] = useState([]);
-  const [valves, setValves] = useState([]);
+  const [periods, setPeriods] = useState({ length: 0, periods: [] });
 
   const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
   const {
@@ -21,7 +20,7 @@ function Valves() {
   useEffect(() => {
     if (readyState === ReadyState.OPEN) {
       send({
-        event: "get/periods",
+        event: "get/periods/request",
       });
     }
   }, [readyState]);
@@ -30,38 +29,51 @@ function Valves() {
   useEffect(() => {
     if (message && message.event && message.data) {
       const { event, data } = message;
-      console.log(event, data);
-      if (event === "get/valves/time/response") setValves([...data]); // Assuming the response is an array of objects
-      // if (event === "valve/time") {
-      //   const nextValves = valves.map((v, i) => {
-      //     if (v.name === data.name) {
-      //       // Increment the clicked counter
-      //       return data;
-      //     } else {
-      //       // The rest haven't changed
-      //       return v;
-      //     }
-      //   });
-      //   setValves(nextValves);
-      // }
+      if (event === "periods/number") {
+        setPeriods((prev) => ({
+          ...prev,
+          length: data,
+        }));
+      }
+
+      if (event === "get/periods/response") {
+        setPeriods(data);
+      }
     }
   }, [message]);
 
-  const handleClick = (name, time) => {
+  const handlePeriodLength = (name, value) => {
     send({
-      event: "set/valve/time/request",
-      data: { name, time },
+      event: "set/periods/number",
+      data: value,
+    });
+  };
+
+  const handlePeriods = (name, value) => {
+    send({
+      event: "set/periods/number",
+      data: value,
     });
   };
 
   return (
     <div className="container mt-5">
       <header className="text-center mb-4">
-        <h1>Длительность периодов</h1>
+        <h1>Пероды</h1>
       </header>
       <div>
+        <div className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center">
+          <div className="d-flex align-items-center mb-2 mb-md-0">
+            <h4 className="me-2">Количество периодов</h4>
+          </div>
+          <InputTimer
+            avalue={periods.length}
+            itemId={0}
+            handleClick={handlePeriodLength}
+          />
+        </div>
         <ul className="list-group">
-          {valves.map(({ name, time }, index) => (
+          {periods.periods.map(({ name, value }, index) => (
             <li
               key={index}
               className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center"
@@ -70,9 +82,9 @@ function Valves() {
                 <h4 className="me-2">Период {name}</h4>
               </div>
               <InputTimer
-                avalue={time}
+                avalue={value}
                 itemId={name}
-                handleClick={handleClick}
+                handleClick={handlePeriods}
               />
             </li>
           ))}
