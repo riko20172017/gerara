@@ -7,6 +7,8 @@ function Valves() {
   const [disabled, setDisabled] = useState([]);
   const [valves, setValves] = useState([]);
 
+  console.log(valves);
+
   const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
   const {
     sendJsonMessage: send,
@@ -36,10 +38,8 @@ function Valves() {
       if (event === "valve/time") {
         const nextValves = valves.map((v, i) => {
           if (v.name === data.name) {
-            // Increment the clicked counter
             return data;
           } else {
-            // The rest haven't changed
             return v;
           }
         });
@@ -47,8 +47,6 @@ function Valves() {
       }
     }
   }, [message]);
-
-
 
   const handleClick = (name, time) => {
     send({
@@ -76,20 +74,23 @@ function Valves() {
                 avalue={time}
                 itemId={name}
                 handleClick={handleClick}
+                min={0}
+                max={300}
+                state={0}
               />
             </li>
           ))}
         </ul>
         <div className="mt-4 text-center">
-					<h5>
-						Общее время полива:{" "}
-						{valves.reduce(
-							(total, valve) => total + valve.time,
-							0
-						)}{" "}
-						минут
-					</h5>
-				</div>
+          <h5>
+            Общее время полива:{" "}
+            {valves.reduce(
+              (total, valve) => parseInt(total) + parseInt(valve.time),
+              0
+            )}{" "}
+            минут
+          </h5>
+        </div>
       </div>
     </div>
   );

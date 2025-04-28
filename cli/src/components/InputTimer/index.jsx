@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
-const InputTimer = ({ avalue, itemId, handleClick }) => {
-  
-  const [value, setValue] = useState(0);
+const InputTimer = ({ avalue, itemId, type, min, max, state, handleClick }) => {
+  const [value, setValue] = useState(state);
+
   return (
     <div className="d-flex align-items-center input-group-lg">
       <span
@@ -13,14 +13,14 @@ const InputTimer = ({ avalue, itemId, handleClick }) => {
         {avalue}
       </span>
       <input
-        type="number"
+        type={type ? type : "number"}
         className="form-control text-center me-1"
         style={{ width: "100px" }}
         placeholder="Минуты"
         value={value}
-        onChange={(e) => setValue(parseInt(e.target.value))}
-        min="0"
-        max="300"
+        onChange={(e) => setValue(e.target.value)}
+        min={min}
+        max={max}
       />
       <button
         className="btn btn-primary"

@@ -2,5 +2,13 @@
     "files.associations": {
         "atomic": "cpp",
         "cstdint": "cpp"
-    }
+    },
+    "vsmqtt.brokerProfiles": [
+        {
+            "name": "gerara",
+            "host": "185.221.155.147",
+            "port": 1883,
+            "clientId": "vsmqtt_client_885f"
+        }
+    ]
 }

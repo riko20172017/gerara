@@ -39,6 +39,17 @@ function Valves() {
       if (event === "get/periods/response") {
         setPeriods(data);
       }
+
+      if (event === "set/period/response") {
+        setPeriods((prev) => ({
+          ...prev,
+          periods: prev.periods.map((period) =>
+            period.name === data.name
+              ? { ...period, value: data.value }
+              : period
+          ),
+        }));
+      }
     }
   }, [message]);
 
@@ -51,15 +62,15 @@ function Valves() {
 
   const handlePeriods = (name, value) => {
     send({
-      event: "set/periods/number",
-      data: value,
+      event: "set/period/request",
+      data: { name, value },
     });
   };
 
   return (
     <div className="container mt-5">
       <header className="text-center mb-4">
-        <h1>Пероды</h1>
+        <h1>Периоды</h1>
       </header>
       <div>
         <div className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center">
@@ -70,6 +81,10 @@ function Valves() {
             avalue={periods.length}
             itemId={0}
             handleClick={handlePeriodLength}
+            state={0}
+            min={1}
+            max={5}
+            type="number"
           />
         </div>
         <ul className="list-group">
@@ -82,9 +97,13 @@ function Valves() {
                 <h4 className="me-2">Период {name}</h4>
               </div>
               <InputTimer
+                type="time"
                 avalue={value}
                 itemId={name}
                 handleClick={handlePeriods}
+                min="0:0"
+                max="23:59"
+                state="00:00"
               />
             </li>
           ))}

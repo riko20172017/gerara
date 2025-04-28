@@ -29,7 +29,7 @@ wss.on("connection", function connection(ws) {
     if (res.event == "set/valve/time/request") {
       broker.publish(
         "vk" + res.data.name,
-        JSON.stringify(res.data.time),
+        res.data.time,
         { qos: 0, retain: false },
         (error) => {
           if (error) {
@@ -45,9 +45,22 @@ wss.on("connection", function connection(ws) {
     }
 
     if (res.event == "set/periods/number") {
+      broker.publish("k.p", res.data, { qos: 0, retain: false }, (error) => {
+        if (error) {
+          console.error("brocker publish fail", error);
+        }
+      });
+    }
+
+    if (res.event == "get/periods/request") {
+      getPeriodsData(ws);
+      setImmediate(() => getPeriodsData(ws));
+    }
+
+    if (res.event == "set/period/request") {
       broker.publish(
-        "k.p",
-        JSON.stringify(res.data),
+        "p" + res.data.name,
+        res.data.value,
         { qos: 0, retain: false },
         (error) => {
           if (error) {
@@ -55,11 +68,6 @@ wss.on("connection", function connection(ws) {
           }
         }
       );
-    }
-
-    if (res.event == "get/periods/request") {
-      getPeriodsData(ws);
-      let interval = setInterval(() => getMetersData(ws), 10000);
     }
   });
 });
@@ -111,34 +119,34 @@ const getMetersData = async (ws) => {
 const getValvesData = async (ws) => {
   const v1 = await db
     .collection("valves")
-    .find({ name: 1 })
+    .find({ name: "1" })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
   const v2 = await db
     .collection("valves")
-    .find({ name: 2 })
+    .find({ name: "2" })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
   const v3 = await db
     .collection("valves")
-    .find({ name: 3 })
+    .find({ name: "3" })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
   const v4 = await db
     .collection("valves")
-    .find({ name: 4 })
+    .find({ name: "4" })
     .sort({ _id: -1 })
     .limit(1)
     .toArray();
 
   const data = [
-    { name: 1, time: v1.length ? parseInt(v1[0].time) : 0 },
-    { name: 2, time: v2.length ? parseInt(v2[0].time) : 0 },
-    { name: 3, time: v3.length ? parseInt(v3[0].time) : 0 },
-    { name: 4, time: v4.length ? parseInt(v4[0].time) : 0 },
+    { name: "1", time: v1.length ? v1[0].time : "0" },
+    { name: "2", time: v2.length ? v2[0].time : "0" },
+    { name: "3", time: v3.length ? v3[0].time : "0" },
+    { name: "4", time: v4.length ? v4[0].time : "0" },
   ];
 
   ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
@@ -185,6 +193,11 @@ broker.on("connect", () => {
     broker.subscribe("vk3o");
     broker.subscribe("vk4o");
     broker.subscribe("k.p");
+    broker.subscribe("p1o");
+    broker.subscribe("p2o");
+    broker.subscribe("p3o");
+    broker.subscribe("p4o");
+    broker.subscribe("p5o");
   }
 });
 
@@ -223,6 +236,20 @@ broker.on("message", (topic, message) => {
       }
     });
   }
+
+  if (
+    topic == "p1o" ||
+    topic == "p2o" ||
+    topic == "p3o" ||
+    topic == "p4o" ||
+    topic == "p5o"
+  ) {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        handlePeriod(client, topic, message);
+      }
+    });
+  }
 });
 
 function handleHumidity(ws, topic, message) {
@@ -236,21 +263,35 @@ function handleHumidity(ws, topic, message) {
 }
 
 function handleValve(ws, topic, message) {
-  const name = parseInt(topic.slice(2, 3));
-  const time = parseInt(message.toString());
+  const name = topic.slice(2, 3);
+  const time = message.toString();
 
   ws.send(JSON.stringify({ event: "valve/time", data: { name, time } }));
   db.collection("valves").insertOne({ name, time });
 }
 
 function handlePeriodCount(ws, topic, message) {
-  const value = parseInt(message);
+  const value = message.toString();
 
   const log = db
     .collection("periods")
     .updateOne({ name: "periods number" }, { $set: { value: value } });
 
   ws.send(JSON.stringify({ event: "periods/number", data: value }));
+}
+
+function handlePeriod(ws, topic, message) {
+  const name = topic.slice(1, 2);
+  const value = message.toString();
+
+  db.collection("periods").updateOne(
+    { name: "period " + name },
+    { $set: { value: value } }
+  );
+
+  ws.send(
+    JSON.stringify({ event: "set/period/response", data: { name, value } })
+  );
 }
 
 broker.on("error", (error) => {
