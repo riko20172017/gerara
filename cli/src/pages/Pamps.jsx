@@ -2,8 +2,9 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-function Valves() {
+function Pampes() {
   const [disabled, setDisabled] = useState([]);
+  const [pamps, setPamps] = useState([]);
   const [valves, setValves] = useState([]);
 
   const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
@@ -20,8 +21,10 @@ function Valves() {
   useEffect(() => {
     if (readyState === ReadyState.OPEN) {
       send({
-        event: "get/valves/time/request",
-        data: {},
+        event: "get/pamps/request",
+      });
+      send({
+        event: "get/valves/request",
       });
     }
   }, [readyState]);
@@ -30,14 +33,25 @@ function Valves() {
   useEffect(() => {
     if (message && message.event && message.data) {
       const { event, data } = message;
-      console.log(event, data);
-      if (event === "get/valves/time/response") setValves([...data]); // Assuming the response is an array of objects
-      if (event === "valve/time") {
-        const nextValves = valves.map((v, i) => {
-          if (v.name === data.name) {
+      if (event === "get/pamps/response") setPamps([...data]); // Assuming the response is an array of objects
+      if (event === "set/pamps/response") {
+        const nextPamps = pamps.map((pamp, i) => {
+          if (pamp.name === data.name) {
             return data;
           } else {
-            return v;
+            return pamp;
+          }
+        });
+        setPamps(nextPamps);
+      }
+      if (event === "get/valves/response") setValves([...data]);
+      if (event === "set/valve/status/response") {
+        console.log(data)
+        const nextValves = valves.map((valve, i) => {
+          if (valve.name === data.name) {
+            return data;
+          } else {
+            return valve;
           }
         });
         setValves(nextValves);
@@ -45,37 +59,95 @@ function Valves() {
     }
   }, [message]);
 
-  const handleClick = (name, time) => {
+  const handleClickPamp = (name, value) => {
     send({
-      event: "set/valve/time/request",
-      data: { name, time },
+      event: "set/pamp/request",
+      data: { name, value },
+    });
+  };
+
+  const handleClickValve = (name, value) => {
+    send({
+      event: "set/valve/status/request",
+      data: { name, value },
     });
   };
 
   return (
     <div className="container mt-5">
       <header className="text-center mb-4">
-        <h1>Насосы</h1>
+        <h1>Ручное управление</h1>
       </header>
       <div>
         <ul className="list-group">
-          {valves.map(({ name, time }, index) => (
+          {pamps.map(({ name, value }, i) => (
             <li
-              key={index}
+              key={i}
               className="list-group-item d-flex flex-row flex-md-row justify-content-between align-items-center"
             >
               <div className="d-flex align-items-center mb-2 mb-md-0">
-                <h4 className="me-2 position-relative">
-                  Насос {name}
-                </h4>
+                <h4 className="me-2 position-relative">Насос {name}</h4>
               </div>
               <div>
-                {/* <button type="button" class="btn btn-primary">
-                  Вкл
-                </button> */}
-                <button type="button" class="btn btn-light">
-                  Выкл
-                </button>
+                {value == "on" && <span className="badge bg-success"> </span>}{" "}
+                {value == "off" && <span className="badge bg-warning"> </span>}{" "}
+                {value == "off" && (
+                  <button
+                    type="button"
+                    style={{ width: "110px" }}
+                    className="btn btn-link"
+                    onClick={() => handleClickPamp(name, "on")}
+                  >
+                    Включить
+                  </button>
+                )}
+                {value == "on" && (
+                  <button
+                    type="button"
+                    style={{ width: "110px" }}
+                    className="btn btn-link"
+                    onClick={() => handleClickPamp(name, "off")}
+                  >
+                    Выключить
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+
+          {/* Клапаны  */}
+
+          {valves.map(({ name, status }, i) => (
+            <li
+              key={i}
+              className="list-group-item d-flex flex-row flex-md-row justify-content-between align-items-center"
+            >
+              <div className="d-flex align-items-center mb-2 mb-md-0">
+                <h4 className="me-2 position-relative">Клапан {name}</h4>
+              </div>
+              <div>
+                {status == "on" && <span className="badge bg-success"> </span>}{" "}
+                {status == "off" && <span className="badge bg-warning"> </span>}{" "}
+                {status == "off" && (
+                  <button
+                    type="button"
+                    style={{ width: "110px" }}
+                    className="btn btn-link"
+                    onClick={() => handleClickValve(name, "on")}
+                  >
+                    Включить
+                  </button>
+                )}
+                {status == "on" && (
+                  <button
+                    type="button"
+                    style={{ width: "110px" }}
+                    className="btn btn-link"
+                    onClick={() => handleClickValve(name, "off")}
+                  >
+                    Выключить
+                  </button>
+                )}
               </div>
             </li>
           ))}
@@ -85,4 +157,4 @@ function Valves() {
   );
 }
 
-export default Valves;
+export default Pampes;

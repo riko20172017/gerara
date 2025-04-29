@@ -7,8 +7,6 @@ function Valves() {
   const [disabled, setDisabled] = useState([]);
   const [valves, setValves] = useState([]);
 
-  console.log(valves);
-
   const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
   const {
     sendJsonMessage: send,
@@ -23,7 +21,7 @@ function Valves() {
   useEffect(() => {
     if (readyState === ReadyState.OPEN) {
       send({
-        event: "get/valves/time/request",
+        event: "get/valves/request",
         data: {},
       });
     }
@@ -33,8 +31,7 @@ function Valves() {
   useEffect(() => {
     if (message && message.event && message.data) {
       const { event, data } = message;
-      console.log(event, data);
-      if (event === "get/valves/time/response") setValves([...data]); // Assuming the response is an array of objects
+      if (event === "get/valves/response") setValves([...data]); // Assuming the response is an array of objects
       if (event === "valve/time") {
         const nextValves = valves.map((v, i) => {
           if (v.name === data.name) {

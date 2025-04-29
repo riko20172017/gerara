@@ -22,7 +22,7 @@ wss.on("connection", function connection(ws) {
   ws.on("message", function message(r) {
     res = JSON.parse(r);
 
-    if (res.event == "get/valves/time/request") {
+    if (res.event == "get/valves/request") {
       setImmediate(() => getValvesData(ws));
     }
 
@@ -58,10 +58,39 @@ wss.on("connection", function connection(ws) {
     }
 
     if (res.event == "set/period/request") {
-
       broker.publish(
         "p" + res.data.name,
         res.data.value.replace(":", ""),
+        { qos: 0, retain: false },
+        (error) => {
+          if (error) {
+            console.error("brocker publish fail", error);
+          }
+        }
+      );
+    }
+
+    if (res.event == "get/pamps/request") {
+      setImmediate(() => getPamps(ws));
+    }
+
+    if (res.event == "set/pamp/request") {
+      broker.publish(
+        "nasos" + res.data.name,
+        res.data.value,
+        { qos: 0, retain: false },
+        (error) => {
+          if (error) {
+            console.error("brocker publish fail", error);
+          }
+        }
+      );
+    }
+
+    if (res.event == "set/valve/status/request") {
+      broker.publish(
+        "valve" + res.data.name,
+        res.data.value,
         { qos: 0, retain: false },
         (error) => {
           if (error) {
@@ -118,39 +147,10 @@ const getMetersData = async (ws) => {
 };
 
 const getValvesData = async (ws) => {
-  const v1 = await db
-    .collection("valves")
-    .find({ name: "1" })
-    .sort({ _id: -1 })
-    .limit(1)
-    .toArray();
-  const v2 = await db
-    .collection("valves")
-    .find({ name: "2" })
-    .sort({ _id: -1 })
-    .limit(1)
-    .toArray();
-  const v3 = await db
-    .collection("valves")
-    .find({ name: "3" })
-    .sort({ _id: -1 })
-    .limit(1)
-    .toArray();
-  const v4 = await db
-    .collection("valves")
-    .find({ name: "4" })
-    .sort({ _id: -1 })
-    .limit(1)
-    .toArray();
+  const data = await db.collection("valves").find().toArray();
+  const valves = data.map(({ name, time, status }) => ({ name, time, status }));
 
-  const data = [
-    { name: "1", time: v1.length ? v1[0].time : "0" },
-    { name: "2", time: v2.length ? v2[0].time : "0" },
-    { name: "3", time: v3.length ? v3[0].time : "0" },
-    { name: "4", time: v4.length ? v4[0].time : "0" },
-  ];
-
-  ws.send(JSON.stringify({ event: "get/valves/time/response", data }));
+  ws.send(JSON.stringify({ event: "get/valves/response", data: valves }));
 };
 
 const getPeriodsData = async (ws) => {
@@ -158,11 +158,18 @@ const getPeriodsData = async (ws) => {
   data = {
     length: data.shift().value,
     periods: data.map(({ value }, i) => {
-      return { name: `${i + 1}`, value }; 
+      return { name: `${i + 1}`, value };
     }),
   };
 
   ws.send(JSON.stringify({ event: "get/periods/response", data }));
+};
+
+const getPamps = async (ws) => {
+  let data = await db.collection("pamps").find().toArray();
+  data = data.map(({ name, value }) => ({ name, value }));
+
+  ws.send(JSON.stringify({ event: "get/pamps/response", data }));
 };
 
 const brokerIp = process.env.BROKER_IP;
@@ -199,6 +206,13 @@ broker.on("connect", () => {
     broker.subscribe("p3o");
     broker.subscribe("p4o");
     broker.subscribe("p5o");
+    broker.subscribe("nasos1o");
+    broker.subscribe("nasos2o");
+    broker.subscribe("nasos3o");
+    broker.subscribe("valve1o");
+    broker.subscribe("valve2o");
+    broker.subscribe("valve3o");
+    broker.subscribe("valve4o");
   }
 });
 
@@ -225,7 +239,7 @@ broker.on("message", (topic, message) => {
   ) {
     wss.clients.forEach((client) => {
       if (client.readyState === 1) {
-        handleValve(client, topic, message);
+        handleValveTime(client, topic, message);
       }
     });
   }
@@ -251,6 +265,27 @@ broker.on("message", (topic, message) => {
       }
     });
   }
+
+  if (topic == "nasos1o" || topic == "nasos2o" || topic == "nasos3o") {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        handlePamp(client, topic, message);
+      }
+    });
+  }
+
+  if (
+    topic == "valve1o" ||
+    topic == "valve2o" ||
+    topic == "valve3o" ||
+    topic == "valve4o"
+  ) {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        handleValveStatus(client, topic, message);
+      }
+    });
+  }
 });
 
 function handleHumidity(ws, topic, message) {
@@ -263,12 +298,12 @@ function handleHumidity(ws, topic, message) {
   });
 }
 
-function handleValve(ws, topic, message) {
+function handleValveTime(ws, topic, message) {
   const name = topic.slice(2, 3);
   const time = message.toString();
 
   ws.send(JSON.stringify({ event: "valve/time", data: { name, time } }));
-  db.collection("valves").insertOne({ name, time });
+  db.collection("valves").updateOne({ name }, { $set: { time } });
 }
 
 function handlePeriodCount(ws, topic, message) {
@@ -292,6 +327,28 @@ function handlePeriod(ws, topic, message) {
 
   ws.send(
     JSON.stringify({ event: "set/period/response", data: { name, value } })
+  );
+}
+
+function handlePamp(ws, topic, message) {
+  const name = topic.slice(-2, -1);
+  const value = message.toString();
+
+  db.collection("pamps").updateOne({ name }, { $set: { value: value } });
+
+  ws.send(
+    JSON.stringify({ event: "set/pamps/response", data: { name, value } })
+  );
+}
+
+function handleValveStatus(ws, topic, message) {
+  const name = topic.slice(-2, -1);
+  const status = message.toString();
+
+  db.collection("valves").updateOne({ name }, { $set: { status } });
+
+  ws.send(
+    JSON.stringify({ event: "set/valve/status/response", data: { name, status } })
   );
 }
 
