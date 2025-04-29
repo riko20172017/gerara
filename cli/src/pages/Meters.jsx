@@ -24,6 +24,17 @@ export default function Meters() {
     }
   }, [message]);
 
+  useEffect(() => {
+    const intervalId  = setInterval(() => {
+      if (readyState === 1) {
+        send({
+          event: "get/meters/data/request",
+        });
+      }
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <div className="container py-4">
       <h1 className="text-center mb-4">IoT Счетчики</h1>
