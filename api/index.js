@@ -58,9 +58,10 @@ wss.on("connection", function connection(ws) {
     }
 
     if (res.event == "set/period/request") {
+
       broker.publish(
         "p" + res.data.name,
-        res.data.value,
+        res.data.value.replace(":", ""),
         { qos: 0, retain: false },
         (error) => {
           if (error) {
@@ -157,7 +158,7 @@ const getPeriodsData = async (ws) => {
   data = {
     length: data.shift().value,
     periods: data.map(({ value }, i) => {
-      return { name: `${i + 1}`, value };
+      return { name: `${i + 1}`, value }; 
     }),
   };
 
