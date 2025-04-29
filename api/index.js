@@ -99,6 +99,23 @@ wss.on("connection", function connection(ws) {
         }
       );
     }
+
+    if (res.event == "get/avtomat/request") {
+      setImmediate(() => getAvtomat(ws));
+    }
+
+    if (res.event == "set/avtomat/status/request") {
+      broker.publish(
+        "aru",
+        res.data.value,
+        { qos: 0, retain: false },
+        (error) => {
+          if (error) {
+            console.error("brocker publish fail", error);
+          }
+        }
+      );
+    }
   });
 });
 
@@ -172,6 +189,19 @@ const getPamps = async (ws) => {
   ws.send(JSON.stringify({ event: "get/pamps/response", data }));
 };
 
+const getAvtomat = async (ws) => {
+  const data = await db.collection("avtomat").findOne();
+  ws.send(
+    JSON.stringify({
+      event: "get/avtomat/response",
+      data: {
+        name: data.name,
+        status: data.status,
+      },
+    })
+  );
+};
+
 const brokerIp = process.env.BROKER_IP;
 const protocol = "mqtt";
 const portMqtt = "1883";
@@ -213,6 +243,7 @@ broker.on("connect", () => {
     broker.subscribe("valve2o");
     broker.subscribe("valve3o");
     broker.subscribe("valve4o");
+    broker.subscribe("aruo");
   }
 });
 
@@ -286,6 +317,14 @@ broker.on("message", (topic, message) => {
       }
     });
   }
+
+  if (topic == "aruo") {
+    wss.clients.forEach((client) => {
+      if (client.readyState === 1) {
+        handleAvtomatStatus(client, topic, message);
+      }
+    });
+  }
 });
 
 function handleHumidity(ws, topic, message) {
@@ -348,7 +387,23 @@ function handleValveStatus(ws, topic, message) {
   db.collection("valves").updateOne({ name }, { $set: { status } });
 
   ws.send(
-    JSON.stringify({ event: "set/valve/status/response", data: { name, status } })
+    JSON.stringify({
+      event: "set/valve/status/response",
+      data: { name, status },
+    })
+  );
+}
+
+function handleAvtomatStatus(ws, topic, message) {
+  const status = message.toString();
+
+  db.collection("avtomat").updateOne({ name: "1" }, { $set: { status } });
+
+  ws.send(
+    JSON.stringify({
+      event: "set/avtomat/status/response",
+      data: { name: "1", status },
+    })
   );
 }
 

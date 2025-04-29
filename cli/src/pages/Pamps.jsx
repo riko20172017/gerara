@@ -6,6 +6,7 @@ function Pampes() {
   const [disabled, setDisabled] = useState([]);
   const [pamps, setPamps] = useState([]);
   const [valves, setValves] = useState([]);
+  const [avtomat, setAvtomat] = useState({});
 
   const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
   const {
@@ -25,6 +26,9 @@ function Pampes() {
       });
       send({
         event: "get/valves/request",
+      });
+      send({
+        event: "get/avtomat/request",
       });
     }
   }, [readyState]);
@@ -46,7 +50,6 @@ function Pampes() {
       }
       if (event === "get/valves/response") setValves([...data]);
       if (event === "set/valve/status/response") {
-        console.log(data)
         const nextValves = valves.map((valve, i) => {
           if (valve.name === data.name) {
             return data;
@@ -55,6 +58,10 @@ function Pampes() {
           }
         });
         setValves(nextValves);
+      }
+      if (event === "get/avtomat/response") setAvtomat({ ...data });
+      if (event === "set/avtomat/status/response") {
+        setAvtomat({ ...data });
       }
     }
   }, [message]);
@@ -73,6 +80,13 @@ function Pampes() {
     });
   };
 
+  const handleClickAvtomate = (name, value) => {
+    send({
+      event: "set/avtomat/status/request",
+      data: { name, value },
+    });
+  };
+
   return (
     <div className="container mt-5">
       <header className="text-center mb-4">
@@ -80,6 +94,42 @@ function Pampes() {
       </header>
       <div>
         <ul className="list-group">
+          {/* Автомат */}
+          <li className="list-group-item d-flex flex-row flex-md-row justify-content-between align-items-center">
+            <div className="d-flex align-items-center mb-2 mb-md-0">
+              <h4 className="me-2 position-relative">Автомат {avtomat.name}</h4>
+            </div>
+            <div>
+              {avtomat.status == "on" && (
+                <span className="badge bg-success"> </span>
+              )}{" "}
+              {avtomat.status == "off" && (
+                <span className="badge bg-warning"> </span>
+              )}{" "}
+              {avtomat.status == "off" && (
+                <button
+                  type="button"
+                  style={{ width: "110px" }}
+                  className="btn btn-link"
+                  onClick={() => handleClickAvtomate(avtomat.name, "on")}
+                >
+                  Включить
+                </button>
+              )}
+              {avtomat.status == "on" && (
+                <button
+                  type="button"
+                  style={{ width: "110px" }}
+                  className="btn btn-link"
+                  onClick={() => handleClickAvtomate(avtomat.name, "off")}
+                >
+                  Выключить
+                </button>
+              )}
+            </div>
+          </li>
+
+          {/* Насосы  */}
           {pamps.map(({ name, value }, i) => (
             <li
               key={i}
