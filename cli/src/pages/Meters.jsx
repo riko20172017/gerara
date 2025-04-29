@@ -1,9 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react';
-import WebSocketContext from '../websocket/WebSocketContext';
+import React, { useContext, useState, useEffect } from "react";
+import WebSocketContext from "../websocket/WebSocketContext";
+import Meter from "../components/Meter/meter";
 
 export default function Meters() {
   const { send, message, readyState } = useContext(WebSocketContext);
-
   const [meters, setMeters] = useState([]);
 
   // Handle WebSocket connection state
@@ -29,16 +29,12 @@ export default function Meters() {
       <h1 className="text-center mb-4">IoT Счетчики</h1>
       <div className="row g-4">
         {meters.map((meter, index) => (
-          <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={index}>
-            <div className="card shadow-sm h-100">
-              <div className="card-body text-center">
-                <h5 className="card-title">{meter.name}</h5>
-                <p className="card-text">
-                  <strong>Значение:</strong> {meter.value}
-                </p>
-              </div>
-            </div>
-          </div>
+          <Meter
+            name={meter.name}
+            value={meter.value}
+            index={index}
+            key={index}
+          />
         ))}
       </div>
     </div>
