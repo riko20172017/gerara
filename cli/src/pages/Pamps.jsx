@@ -1,26 +1,15 @@
-import useWebSocket, { ReadyState } from "react-use-websocket";
-import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useContext, useState, useEffect } from 'react';
+import WebSocketContext from '../websocket/WebSocketContext';
 
 function Pampes() {
-  const [disabled, setDisabled] = useState([]);
+  const { send, message, readyState } = useContext(WebSocketContext);
   const [pamps, setPamps] = useState([]);
   const [valves, setValves] = useState([]);
   const [avtomat, setAvtomat] = useState({});
 
-  const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
-  const {
-    sendJsonMessage: send,
-    lastJsonMessage: message,
-    readyState,
-  } = useWebSocket(WS_URL, {
-    share: false,
-    shouldReconnect: () => true,
-  });
-
   // Handle WebSocket connection state
   useEffect(() => {
-    if (readyState === ReadyState.OPEN) {
+    if (readyState === 1) {
       send({
         event: "get/pamps/request",
       });

@@ -1,24 +1,14 @@
-import useWebSocket, { ReadyState } from "react-use-websocket";
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from 'react';
+import WebSocketContext from '../websocket/WebSocketContext';
 import InputTimer from "../components/InputTimer";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 function Valves() {
+  const { send, message, readyState } = useContext(WebSocketContext);
   const [periods, setPeriods] = useState({ length: 0, periods: [] });
-
-  const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
-  const {
-    sendJsonMessage: send,
-    lastJsonMessage: message,
-    readyState,
-  } = useWebSocket(WS_URL, {
-    share: false,
-    shouldReconnect: () => true,
-  });
 
   // Handle WebSocket connection state
   useEffect(() => {
-    if (readyState === ReadyState.OPEN) {
+    if (readyState === 1) {
       send({
         event: "get/periods/request",
       });
@@ -108,16 +98,6 @@ function Valves() {
             </li>
           ))}
         </ul>
-        {/* <div className="mt-4 text-center">
-					<h5>
-						Общее время полива:{" "}
-						{valves.reduce(
-							(total, valve) => total + valve.time,
-							0
-						)}{" "}
-						минут
-					</h5>
-				</div> */}
       </div>
     </div>
   );

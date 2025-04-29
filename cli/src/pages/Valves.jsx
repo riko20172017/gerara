@@ -1,25 +1,15 @@
-import useWebSocket, { ReadyState } from "react-use-websocket";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import WebSocketContext from '../websocket/WebSocketContext';
 import InputTimer from "../components/InputTimer";
-import "bootstrap/dist/css/bootstrap.min.css";
+
 
 function Valves() {
-  const [disabled, setDisabled] = useState([]);
+  const { send, message, readyState } = useContext(WebSocketContext);
   const [valves, setValves] = useState([]);
-
-  const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
-  const {
-    sendJsonMessage: send,
-    lastJsonMessage: message,
-    readyState,
-  } = useWebSocket(WS_URL, {
-    share: false,
-    shouldReconnect: () => true,
-  });
 
   // Handle WebSocket connection state
   useEffect(() => {
-    if (readyState === ReadyState.OPEN) {
+    if (readyState === 1) {
       send({
         event: "get/valves/request",
         data: {},

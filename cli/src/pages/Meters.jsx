@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from "react";
-import useWebSocket, { ReadyState } from "react-use-websocket";
+import React, { useContext, useState, useEffect } from 'react';
+import WebSocketContext from '../websocket/WebSocketContext';
 
 export default function Meters() {
-  const WS_URL = `ws://${process.env.REACT_APP_API_IP}:7000`;
-  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
-    WS_URL, { share: false, shouldReconnect: () => true });
+  const { send, message, readyState } = useContext(WebSocketContext);
 
   const [meters, setMeters] = useState([]);
 
   // Handle WebSocket connection state
   useEffect(() => {
-    if (readyState === ReadyState.OPEN) {
-      sendJsonMessage({
+    if (readyState === 1) {
+      send({
         event: "get/meters/data/request",
       });
     }
@@ -19,12 +17,12 @@ export default function Meters() {
 
   // Handle incoming WebSocket messages
   useEffect(() => {
-    if (lastJsonMessage) {
-      if (lastJsonMessage.event === "get/meters/data/response") {
-        setMeters([...lastJsonMessage.data]);
+    if (message) {
+      if (message.event === "get/meters/data/response") {
+        setMeters([...message.data]);
       }
     }
-  }, [lastJsonMessage]);
+  }, [message]);
 
   return (
     <div className="container py-4">
