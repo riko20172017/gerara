@@ -8,68 +8,60 @@ module.exports = (broker, wss, db) => {
       const e = JSON.parse(r).event;
       const response = JSON.parse(r).data;
 
-      if (e == "get/valves/request") {
-        setImmediate(() => getValvesData(ws));
-      }
-
-      if (e == "set/valve/time/request") {
-        broker.publish(
-          "vk" + response.name,
-          response.time,
-          options,
-          errorHandler
-        );
-      }
-
-      if (e == "get/meters/data/request") {
-        setImmediate(() => getMetersData(ws));
-      }
-
-      if (e == "set/periods/number") {
-        broker.publish("k.p", response, options, errorHandler);
-      }
-
-      if (e == "get/periods/request") {
-        setImmediate(() => getPeriodsData(ws));
-      }
-
-      if (e == "set/period/request") {
-        broker.publish(
-          "p" + response.name,
-          response.value.replace(":", ""),
-          options,
-          errorHandler
-        );
-      }
-
-      if (e == "get/pamps/request") {
-        setImmediate(() => getPamps(ws));
-      }
-
-      if (e == "set/pamp/request") {
-        broker.publish(
-          "nasos" + response.name,
-          response.value,
-          options,
-          errorHandler
-        );
-      }
-
-      if (e == "set/valve/status/request") {
-        broker.publish(
-          "valve" + response.name,
-          response.value,
-          options,
-          errorHandler
-        );
-      }
-
-      if (e == "get/avtomat/request") {
-        setImmediate(() => getAvtomat(ws));
-      }
-
-      if (e == "set/avtomat/status/request") {
-        broker.publish("aru", response.value, options, errorHandler);
+      switch (e) {
+        case "get/valves/request":
+          getValvesData(ws);
+          break;
+        case "set/valve/time/request":
+          broker.publish(
+            "vk" + response.name,
+            response.time,
+            options,
+            errorHandler
+          );
+          break;
+        case "get/meters/data/request":
+          getMetersData(ws);
+          break;
+        case "set/periods/number":
+          broker.publish("k.p", response, options, errorHandler);
+          break;
+        case "get/periods/request":
+          getPeriodsData(ws);
+          break;
+        case "set/period/request":
+          broker.publish(
+            "p" + response.name,
+            response.value.replace(":", ""),
+            options,
+            errorHandler
+          );
+          break;
+        case "get/pamps/request":
+          getPamps(ws);
+          break;
+        case "set/pamp/request":
+          broker.publish(
+            "nasos" + response.name,
+            response.value,
+            options,
+            errorHandler
+          );
+          break;
+        case "set/valve/status/request":
+          broker.publish(
+            "valve" + response.name,
+            response.value,
+            options,
+            errorHandler
+          );
+          break;
+        case "get/avtomat/request":
+          getAvtomat(ws);
+          break;
+        case "set/avtomat/status/request":
+          broker.publish("aru", response.value, options, errorHandler);
+          break;
       }
     });
   });
