@@ -76,36 +76,127 @@ module.exports = (broker, wss, db) => {
 
   const getMetersData = async (ws) => {
     const h = db.collection("m.humidity");
+    const st = db.collection("m.soil-temperature");
+    const at = db.collection("m.air-temperature");
+    const ah = db.collection("m.air-humidity");
+    const wf = db.collection("m.water-flow");
+    const pp = db.collection("m.pumps-output-pressure");
+    const fp = db.collection("m.filters-output-pressure");
+    const ec = db.collection("m.ec");
+    const ph = db.collection("m.ph");
+
     const data = [
+      {
+        ...(await st.findOne(
+          {},
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Температура почвы",
+      },
+      {
+        ...(await at.findOne(
+          {},
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Температура воздуха",
+      },
+      {
+        ...(await ah.findOne(
+          {},
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Влажность воздуха",
+      },
+      {
+        ...(await wf.findOne(
+          { name: "4" },
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Расход воды клапан 4",
+      },
+      {
+        ...(await wf.findOne(
+          { name: "3" },
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Расход воды клапан 3",
+      },
+      {
+        ...(await wf.findOne(
+          { name: "2" },
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Расход воды клапан 2",
+      },
+      {
+        ...(await wf.findOne(
+          { name: "1" },
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Расход воды клапан 1",
+      },
+      {
+        ...(await pp.findOne(
+          {},
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Давление после насосов",
+      },
+      {
+        ...(await fp.findOne(
+          {},
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "Давление после фильтров",
+      },
+      {
+        ...(await ec.findOne(
+          {},
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "EC",
+      },
+      {
+        ...(await ph.findOne(
+          {},
+          { sort: { _id: -1 }, projection: { _id: 0 } }
+        )),
+        name: "PH",
+      },
       {
         ...(await h.findOne(
           { name: "1" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
+          { sort: { _id: -1 }, projection: { _id: 0 } }
         )),
+        name: "Влажность почвы 1",
       },
       {
         ...(await h.findOne(
           { name: "2" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
+          { sort: { _id: -1 }, projection: { _id: 0 } }
         )),
+        name: "Влажность почвы 2",
       },
       {
         ...(await h.findOne(
           { name: "3" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
+          { sort: { _id: -1 }, projection: { _id: 0 } }
         )),
+        name: "Влажность почвы 3",
       },
       {
         ...(await h.findOne(
           { name: "4" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
+          { sort: { _id: -1 }, projection: { _id: 0 } }
         )),
+        name: "Влажность почвы 4",
       },
       {
         ...(await h.findOne(
           { name: "5" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
+          { sort: { _id: -1 }, projection: { _id: 0 } }
         )),
+        name: "Влажность почвы 5",
       },
     ];
 
