@@ -74,38 +74,83 @@ module.exports = (broker, wss, db) => {
     });
   });
 
+  const params = { sort: { _id: -1 }, projection: { _id: 0 } };
+
   const getMetersData = async (ws) => {
     const h = db.collection("m.humidity");
+    const st = db.collection("m.soil-temperature");
+    const at = db.collection("m.air-temperature");
+    const ah = db.collection("m.air-humidity");
+    const wf = db.collection("m.water-flow");
+    const pp = db.collection("m.pumps-output-pressure");
+    const fp = db.collection("m.filters-output-pressure");
+    const ec = db.collection("m.ec");
+    const ph = db.collection("m.ph");
+
     const data = [
       {
-        ...(await h.findOne(
-          { name: "1" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
-        )),
+        ...(await st.findOne({}, params)),
+        name: "Температура почвы",
       },
       {
-        ...(await h.findOne(
-          { name: "2" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
-        )),
+        ...(await at.findOne({}, params)),
+        name: "Температура воздуха",
       },
       {
-        ...(await h.findOne(
-          { name: "3" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
-        )),
+        ...(await ah.findOne({}, params)),
+        name: "Влажность воздуха",
       },
       {
-        ...(await h.findOne(
-          { name: "4" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
-        )),
+        ...(await wf.findOne({ name: "4" }, params)),
+        name: "Расход воды клапан 4",
       },
       {
-        ...(await h.findOne(
-          { name: "5" },
-          { sort: { _id: -1 }, projection: { name: 1, value: 1, _id: 0 } }
-        )),
+        ...(await wf.findOne({ name: "3" }, params)),
+        name: "Расход воды клапан 3",
+      },
+      {
+        ...(await wf.findOne({ name: "2" }, params)),
+        name: "Расход воды клапан 2",
+      },
+      {
+        ...(await wf.findOne({ name: "1" }, params)),
+        name: "Расход воды клапан 1",
+      },
+      {
+        ...(await pp.findOne({}, params)),
+        name: "Давление после насосов",
+      },
+      {
+        ...(await fp.findOne({}, params)),
+        name: "Давление после фильтров",
+      },
+      {
+        ...(await ec.findOne({}, params)),
+        name: "EC",
+      },
+      {
+        ...(await ph.findOne({}, params)),
+        name: "PH",
+      },
+      {
+        ...(await h.findOne({ name: "1" }, params)),
+        name: "Влажность почвы 1",
+      },
+      {
+        ...(await h.findOne({ name: "2" }, params)),
+        name: "Влажность почвы 2",
+      },
+      {
+        ...(await h.findOne({ name: "3" }, params)),
+        name: "Влажность почвы 3",
+      },
+      {
+        ...(await h.findOne({ name: "4" }, params)),
+        name: "Влажность почвы 4",
+      },
+      {
+        ...(await h.findOne({ name: "5" }, params)),
+        name: "Влажность почвы 5",
       },
     ];
 

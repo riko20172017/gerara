@@ -95,7 +95,7 @@ module.exports = (broker, wss, db) => {
   function handleHumidity(topic, message) {
     const name = topic.slice(8, 9);
     const value = message.toString();
-    db.collection("humidity").insertOne({ name, value });
+    db.collection("m.humidity").insertOne({ name, value });
   }
 
   function handleValveTime(topic, message) {
