@@ -10,13 +10,13 @@ module.exports = (broker, wss, db) => {
         } else {
           console.log("Subscribed to topics:", topics);
         }
-      }
+      });
     }
   });
 
   broker.on("message", (topic, message) => {
     console.log(topic);
-    
+
     switch (topic) {
       case "humidity1":
       case "humidity2":
