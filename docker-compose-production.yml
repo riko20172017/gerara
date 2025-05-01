@@ -19,6 +19,8 @@ services:
         condition: service_started
       mongo:
         condition: service_started
+    volumes:
+      - ./api:/api
   broker:
     container_name: broker
     image: eclipse-mosquitto
