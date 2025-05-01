@@ -12,7 +12,7 @@ const broker = mqtt.connect(mqttInits.url, mqttInits.options);
 
 mongo.connect().then((mc) => {
   console.log("Подключение к mongo установлено");
-  db = mc.db("gerara");
+  db = mc.db("gerara"); 
 
   initBroker(broker, wss, db);
   initWebSocket(broker, wss, db);

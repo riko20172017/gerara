@@ -4,14 +4,19 @@ module.exports = (broker, wss, db) => {
   broker.on("connect", () => {
     if (broker.connected === true) {
       console.log(`brocker: connected`);
-
-      topics.forEach((topic) => {
-        broker.subscribe(topic);
-      });
+      broker.subscribe(topics, { qos: 1 }, (err) => {
+        if (err) {
+          console.error("Error subscribing to topics:", err);
+        } else {
+          console.log("Subscribed to topics:", topics);
+        }
+      }
     }
   });
 
   broker.on("message", (topic, message) => {
+    console.log(topic);
+    
     switch (topic) {
       case "humidity1":
       case "humidity2":
@@ -136,6 +141,7 @@ module.exports = (broker, wss, db) => {
     db.collection("pamps").updateOne({ name }, { $set: { value: value } });
 
     send({ event: "set/pamps/response", data: { name, value } });
+    console.log(1);
   }
 
   function handleValveStatus(topic, message) {
