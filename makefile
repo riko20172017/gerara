@@ -3,8 +3,8 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 push:
 	docker compose -f docker-compose-build.yml push api cli	
 pull:
+	docker compose -f docker-compose-production.yml down api cli --rmi -v
 	docker compose -f docker-compose-production.yml pull api cli
-	docker compose -f docker-compose-production.yml rm api cli
 	docker compose -f docker-compose-production.yml up -d api cli
 backup:
 	# docker run --rm --volumes-from mongo -v .\backup:/backup ubuntu tar cvf /backup/backup.tar /data/db
