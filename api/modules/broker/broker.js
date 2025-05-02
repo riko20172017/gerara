@@ -1,22 +1,20 @@
 const topics = require("./topics");
 
-module.exports = (broker, wss, db) => {
-  broker.on("connect", () => {
-    if (broker.connected === true) {
-      console.log(`brocker: connected`);
-      broker.subscribe(topics, { qos: 1 }, (err) => {
+module.exports = (client, wss, db) => {
+  client.on("connect", () => {
+    if (client.connected === true) {
+      console.log("2. Подключение к broker установлено");
+      client.subscribe(topics, { qos: 1 }, (err) => {
         if (err) {
           console.error("Error subscribing to topics:", err);
         } else {
-          console.log("Subscribed to topics:", topics);
+          console.log("   - Mqtt клиент подписался на топики");
         }
       });
     }
   });
 
-  broker.on("message", (topic, message) => {
-    console.log(topic);
-
+  client.on("message", (topic, message) => {
     switch (topic) {
       case "humidity1":
       case "humidity2":
@@ -167,7 +165,7 @@ module.exports = (broker, wss, db) => {
     });
   }
 
-  broker.on("error", (error) => {
+  client.on("error", (error) => {
     console.error("connection failed", error);
   });
 

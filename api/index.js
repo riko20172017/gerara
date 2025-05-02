@@ -2,21 +2,28 @@ const { WebSocketServer } = require("ws");
 const express = require("express"); // подключаем фреймворк Express (модуль)
 const MongoClient = require("mongodb").MongoClient;
 const mqtt = require("mqtt");
-const initBroker = require("./modules/broker/broker.js");
+const setupMqttClient = require("./modules/broker/broker.js");
 const mqttInits = require("./modules/broker/options.js");
-const initWebSocket = require("./modules/socket/socket.js");
+const setupWebSocket = require("./modules/socket/socket.js");
 
-const mongo = new MongoClient(`mongodb://mongo:27017/`);
-const wss = new WebSocketServer({ port: 7000 });
-const broker = mqtt.connect(mqttInits.url, mqttInits.options);
+async function setup() {
+  try {
+    const mongo = new MongoClient(`mongodb://mongo:27017/`);
+    const connection = await mongo.connect();
+    console.log("1. Подключение к mongo установлено");
 
-mongo.connect().then((mc) => {
-  console.log("Подключение к mongo установлено");
-  db = mc.db("gerara"); 
+    const db = connection.db("gerara");
+    const wss = new WebSocketServer({ port: 7000 });
+    const mqttClient = mqtt.connect(mqttInits.url, mqttInits.options);
 
-  initBroker(broker, wss, db);
-  initWebSocket(broker, wss, db);
-});
+    setupMqttClient(mqttClient, wss, db); // инициализируем брокер mqtt
+    setupWebSocket(mqttClient, wss, db); // инициализируем WebSocket
+  } catch (err) {
+    console.error("Ошибка подключения к MongoDB:", err);
+  }
+}
+
+setup();
 
 const app = express(); // создаем экземпляр приложения
 const router = express.Router(); // создаем экземпляр роутера
