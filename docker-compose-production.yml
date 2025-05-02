@@ -99,7 +99,6 @@ volumes:
   certbot-etc:
   wordpress:
   dbdata:
-    external: true
 
 networks:
   app-network:
