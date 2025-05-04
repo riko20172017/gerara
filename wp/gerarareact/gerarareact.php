@@ -29,7 +29,12 @@ add_action('init', 'my_react_app_init');
 // Function for the short code that call React app
 function my_react_app()
 {
-    wp_enqueue_script("my_react_app_js");
+    wp_enqueue_script("
+    my_react_app_js", 
+    plugins_url("/frontend/js/main.js", __FILE__), 
+    array(), 
+    "1.0", 
+    true);
     wp_enqueue_style("my_react_app_css");
     return "<div id=\"root\"></div>";
 }
