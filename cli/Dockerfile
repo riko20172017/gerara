@@ -1,15 +1,5 @@
 ARG PORT=3000
 
-# Stage 1: Build the React app
-FROM node:18-alpine AS production
-WORKDIR /cli
-COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile && npm cache clean --force
-COPY . ./
-ENV REACT_APP_API_IP=185.221.155.147
-ENV REACT_APP_API_PORT=8000
-RUN npm run build
-
 # Stage 2: Development environment -------------------------------------------
 FROM node:18-alpine AS development
 WORKDIR /cli
@@ -21,6 +11,21 @@ EXPOSE $PORT
 ENV REACT_APP_API_IP=127.0.0.1
 ENV REACT_APP_API_PORT=8000
 CMD ["npm", "start"]
+
+# Stage 1: Build the React app
+FROM node:18-alpine AS build
+WORKDIR /cli
+COPY package.json package-lock.json ./
+RUN npm install --frozen-lockfile && npm cache clean --force
+COPY . ./
+ENV REACT_APP_API_IP=185.221.155.147
+ENV REACT_APP_API_PORT=8000
+RUN npm run build
+
+# Stage 3: Minimal production environment
+FROM node:18-alpine AS production
+WORKDIR /cli
+COPY --from=build /cli/build ./build
 
 # Stage 3: Production environment --------------------------------
 # FROM nginx:alpine AS production
