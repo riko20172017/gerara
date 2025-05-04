@@ -38,6 +38,8 @@ services:
     container_name: mysql
     restart: unless-stopped
     env_file: .env
+    ports:
+      - "3306:3306"
     environment:
       - MYSQL_DATABASE=wordpress
     volumes:
