@@ -7,16 +7,16 @@ const Home = () => {
                 <h1>Главная</h1>
                 <ul>
                     <li>
-                        <Link to="/pamps">Насосы</Link>
+                        <Link to="/app/pamps">Насосы</Link>
                     </li>
                     <li>
-                        <Link to="/valves">Клапаны</Link>
+                        <Link to="/app/valves">Клапаны</Link>
                     </li>
                     <li>
-                        <Link to="/periods">Периоды</Link>
+                        <Link to="/app/periods">Периоды</Link>
                     </li>
                     <li>
-                        <Link to="/meters">Датчики</Link>
+                        <Link to="/app/meters">Датчики</Link>
                     </li>
                 </ul>
             </nav>

@@ -25,7 +25,7 @@ RUN npm run build
 # Stage 3: Minimal production environment
 FROM node:18-alpine AS production
 WORKDIR /cli
-COPY --from=build /cli/build ./build
+COPY --from=build /cli/build/static ./build
 
 # Stage 3: Production environment --------------------------------
 # FROM nginx:alpine AS production

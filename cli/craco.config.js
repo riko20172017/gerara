@@ -2,7 +2,7 @@ module.exports = {
   webpack: {
     configure: {
       output: {
-        filename: "js/[name].js",
+        filename: "static/js/[name].js",
       },
       optimization: {
         runtimeChunk: false,
@@ -18,7 +18,7 @@ module.exports = {
     {
       plugin: {
         overrideWebpackConfig: ({ webpackConfig }) => {
-          webpackConfig.plugins[5].options.filename = "css/[name].css";
+          webpackConfig.plugins[5].options.filename = "static/css/[name].css";
           return webpackConfig;
         },
       },
