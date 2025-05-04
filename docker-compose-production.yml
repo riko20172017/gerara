@@ -43,8 +43,6 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
     command: "--default-authentication-plugin=mysql_native_password"
-    networks:
-      - app-network
 
   wordpress:
     depends_on:
@@ -68,8 +66,6 @@ services:
       - cli:/var/www/html/wp-content/plugins/gerarareact/frontend
       - ./wp/apache-ssl.conf:/etc/apache2/sites-available/000-default.conf      
       - ./wp/gerarareact:/var/www/html/wp-content/plugins/gerarareact
-    networks:
-      - app-network
     command:
       bash -c "a2enmod ssl && apache2-foreground"
 
@@ -90,7 +86,3 @@ volumes:
   wordpress:
   dbdata:
   cli:
-
-networks:
-  app-network:
-    driver: bridge
