@@ -2,18 +2,15 @@ services:
   cli:
     image: riko2018/iot-cli
     container_name: cli
-    restart: always
-    ports:
-      - "3000:80"
-    stdin_open: true
-    tty: true
+    volumes:
+      - cli:/cli/build/static
   api:
     image: riko2018/iot-api
     container_name: api
     restart: always
     ports:
-      - '8000:8000'
-      - '7000:7000'
+      - "8000:8000"
+      - "7000:7000"
     depends_on:
       broker:
         condition: service_started
@@ -45,13 +42,14 @@ services:
       - MYSQL_DATABASE=wordpress
     volumes:
       - dbdata:/var/lib/mysql
-    command: '--default-authentication-plugin=mysql_native_password'
+    command: "--default-authentication-plugin=mysql_native_password"
     networks:
       - app-network
 
   wordpress:
     depends_on:
       - db
+      - cli
     image: wordpress
     container_name: wp
     restart: unless-stopped
@@ -61,26 +59,19 @@ services:
       - WORDPRESS_DB_USER=$MYSQL_USER
       - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
       - WORDPRESS_DB_NAME=wordpress
-    volumes:
-      - wordpress:/var/www/html
-    networks:
-      - app-network
-
-  webserver:
-    depends_on:
-      - wordpress
-    image: nginx:1.15.12-alpine
-    container_name: nginx
-    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - wordpress:/var/www/html
-      - ./nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
+      - cli:/var/www/html/wp-content/plugins/gerarareact/frontend
+      - ./wp/apache-ssl.conf:/etc/apache2/sites-available/000-default.conf      
+      - ./wp/gerarareact:/var/www/html/wp-content/plugins/gerarareact
     networks:
       - app-network
+    command:
+      bash -c "a2enmod ssl && apache2-foreground"
 
   # certbot:
   #   depends_on:
@@ -92,13 +83,13 @@ services:
   #     - wordpress:/var/www/html
   #   command: certonly --webroot --webroot-path=/var/www/html --email sammy@your_domain --agree-tos --no-eff-email --force-renewal -d your_domain -d www.your_domain
 
-  
 volumes:
   mongo:
   api:
   certbot-etc:
   wordpress:
   dbdata:
+  cli:
 
 networks:
   app-network:
