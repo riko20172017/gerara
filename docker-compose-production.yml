@@ -3,7 +3,7 @@ services:
     image: riko2018/iot-cli
     container_name: cli
     volumes:
-      - cli:/cli/build
+      - cli:/cli
   api:
     image: riko2018/iot-api
     container_name: api
