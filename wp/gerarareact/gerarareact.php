@@ -34,7 +34,7 @@ function my_react_app()
     my_react_app_js", 
     plugins_url("/frontend/js/main.js", __FILE__), 
     array(), 
-    "1.0", 
+    "2.0", 
     true);
     wp_enqueue_style("my_react_app_css");
     return "<div id=\"root\"></div>";
