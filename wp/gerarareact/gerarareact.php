@@ -21,6 +21,12 @@ function my_react_app_init()
     array(), 
     "1.0", 
     true);
+    wp_register_script("
+    my_react_app_js_map", 
+    plugins_url($path . "/js/main.js.map", __FILE__), 
+    array(), 
+    "1.0", 
+    true);
     wp_register_style("my_react_app_css", plugins_url($path . "/css/main.css", __FILE__), array(), "1.0", "all");
 }
 
@@ -29,6 +35,12 @@ add_action('init', 'my_react_app_init');
 // Function for the short code that call React app
 function my_react_app()
 {
+    wp_enqueue_script("
+    my_react_app_js_map", 
+    plugins_url("/frontend/js/main.js.map", __FILE__), 
+    array(), 
+    "1.0", 
+    true);
     wp_enqueue_script("
     my_react_app_js", 
     plugins_url("/frontend/js/main.js", __FILE__), 
