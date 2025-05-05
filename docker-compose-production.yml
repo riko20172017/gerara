@@ -11,6 +11,8 @@ services:
     ports:
       - "8000:8000"
       - "7000:7000"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
     depends_on:
       broker:
         condition: service_started
