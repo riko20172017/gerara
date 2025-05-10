@@ -3,7 +3,7 @@ services:
     image: riko2018/iot-cli
     container_name: cli
     volumes:
-      - cli:/cli/build
+      - cli:/cli
   api:
     image: riko2018/iot-api
     container_name: api
@@ -11,6 +11,8 @@ services:
     ports:
       - "8000:8000"
       - "7000:7000"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
     depends_on:
       broker:
         condition: service_started

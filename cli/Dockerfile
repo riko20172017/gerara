@@ -24,8 +24,13 @@ RUN npm run build
 
 # Stage 3: Minimal production environment
 FROM node:18-alpine AS production
-WORKDIR /cli
-COPY --from=build /cli/build/static ./build
+COPY entrypoint.sh /entrypoint.sh
+COPY --from=build /cli/build/static /build
+RUN chmod +x /entrypoint.sh
+VOLUME /cli
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["sleep", "3600"]
+
 
 # Stage 3: Production environment --------------------------------
 # FROM nginx:alpine AS production

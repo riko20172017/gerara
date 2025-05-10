@@ -1,10 +1,17 @@
 const { WebSocketServer } = require("ws");
+const { createServer } = require("https");
+const { readFileSync } = require("fs");
 const express = require("express"); // подключаем фреймворк Express (модуль)
 const MongoClient = require("mongodb").MongoClient;
 const mqtt = require("mqtt");
 const setupMqttClient = require("./modules/broker/broker.js");
 const mqttInits = require("./modules/broker/options.js");
 const setupWebSocket = require("./modules/socket/socket.js");
+
+const server = createServer({
+  cert: readFileSync('/etc/letsencrypt/live/gerara.ru/cert.pem'),
+  key: readFileSync('/etc/letsencrypt/live/gerara.ru/privkey.pem')
+});
 
 async function setup() {
   try {
@@ -13,11 +20,12 @@ async function setup() {
     console.log("1. Подключение к mongo установлено");
 
     const db = connection.db("gerara");
-    const wss = new WebSocketServer({ port: 7000 });
+    const wss = new WebSocketServer({ server });
     const mqttClient = mqtt.connect(mqttInits.url, mqttInits.options);
 
     setupMqttClient(mqttClient, wss, db); // инициализируем брокер mqtt
     setupWebSocket(mqttClient, wss, db); // инициализируем WebSocket
+    server.listen(7000)
   } catch (err) {
     console.error("Ошибка подключения к MongoDB:", err);
   }
