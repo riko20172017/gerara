@@ -89,10 +89,10 @@ function Pampes() {
             <div class="card align-items-center border-0">
               <Back></Back>
               <img
-                src="/img/pump.png"
+                src={`${process.env.REACT_APP_STATIC_PATH}/pump.png`}
                 class="card-img-top"
                 alt="..."
-                style={{ width: "30%", opacity:"0" }}
+                style={{ width: "30%", opacity: "0" }}
               />
               <div class="card-body">
                 <h5 class="card-title">
@@ -130,7 +130,7 @@ function Pampes() {
             <div class="col" key={i}>
               <div class="card align-items-center pt-2 border-0">
                 <img
-                  src="/img/pump.png"
+                  src={`${process.env.REACT_APP_STATIC_PATH}/pump.png`}
                   class="card-img-top"
                   alt="..."
                   style={{ width: "50%" }}
@@ -175,7 +175,7 @@ function Pampes() {
             <div class="col" key={i}>
               <div class="card align-items-center border-0">
                 <img
-                  src="/img/valve.png"
+                  src={`${process.env.REACT_APP_STATIC_PATH}/valve.png`}
                   class="card-img-top"
                   alt="..."
                   style={{ width: "50%" }}

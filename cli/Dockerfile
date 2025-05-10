@@ -10,6 +10,7 @@ COPY . ./
 EXPOSE $PORT
 ENV REACT_APP_API_IP=127.0.0.1
 ENV REACT_APP_API_PORT=8000
+ENV REACT_APP_STATIC_PATH="/img"
 CMD ["npm", "start"]
 
 # Stage 1: Build the React app
@@ -20,6 +21,7 @@ RUN npm install --frozen-lockfile && npm cache clean --force
 COPY . ./
 ENV REACT_APP_API_IP=185.221.155.147
 ENV REACT_APP_API_PORT=8000
+ENV REACT_APP_STATIC_PATH="/wp-content/plugins/gerarareact/frontend/img"
 RUN npm run build
 
 # Stage 3: Minimal production environment
