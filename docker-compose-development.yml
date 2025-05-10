@@ -45,7 +45,7 @@ services:
     image: mongo
     container_name: mongo
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
       interval: 5s
       timeout: 5s
       retries: 3
