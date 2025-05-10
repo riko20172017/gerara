@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 const Layout = () => {
   const location = useLocation();
   return (
-    <div className="container mt-1">
+    <div className="container mt-3">
       {location.pathname === "/app" ? "" : ""}
       <Outlet />
     </div>

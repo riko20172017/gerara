@@ -2,7 +2,17 @@
 // $body-bg: #000;
 
 // Import Bootstrap and its default variables
-@import '~bootstrap/scss/bootstrap.scss';
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 720px,
+  xl: 720px,
+  xxl: 720px,
+);
+
+@import "~bootstrap/scss/bootstrap.scss";
+
+
 
 li {
   list-style: none;

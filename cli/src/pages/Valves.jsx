@@ -45,9 +45,14 @@ function Valves() {
   return (
     <div>
       <header className="text-center mb-4">
-        <div className="d-flex align-items-center mb-2 mb-md-0">
+        <div className="d-flex flex-column justify-content-sm-between align-items-stretch flex-sm-row text-light gap-1">
           <Back></Back>
-          <h2 className="me-2">Длительность полива</h2>
+          <h2
+            className="flex-fill display-6 text-light bg-dark m-0 pb-2"
+            style={{ fontSize: "24px" }}
+          >
+            Длительность полива
+          </h2>
         </div>
       </header>
       <div>
@@ -55,12 +60,10 @@ function Valves() {
           {valves.map(({ name, time }, index) => (
             <li
               key={index}
-              className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center"
+              className="list-group-item d-flex flex-column align-items-center align-items-sm-stretch p-0 mb-1"
             >
-              <div className="d-flex align-items-center mb-2 mb-md-0">
-                <h4 className="me-2">Клапанная группа {name}</h4>
-              </div>
               <InputTimer
+                label={`Клапанная группа ${name}`}
                 avalue={time}
                 itemId={name}
                 handleClick={handleClick}
@@ -71,15 +74,19 @@ function Valves() {
             </li>
           ))}
         </ul>
-        <div className="mt-4 text-center">
-          <h5>
-            Общее время полива:{" "}
-            {valves.reduce(
-              (total, valve) => parseInt(total) + parseInt(valve.time),
-              0
-            )}{" "}
-            минут
-          </h5>
+        <div className="text-left">
+          <div className="d-flex flex-column flex-sm-row text-light gap-1">
+            <span
+              className="flex-fill text-light bg-dark m-0 p-2"
+            >
+              Общее время полива:{" "}
+              {valves.reduce(
+                (total, valve) => parseInt(total) + parseInt(valve.time),
+                0
+              )}{" "}
+              минут
+            </span>
+          </div>
         </div>
       </div>
     </div>
