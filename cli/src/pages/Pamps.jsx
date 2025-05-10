@@ -1,5 +1,6 @@
-import React, { useContext, useState, useEffect } from 'react';
-import WebSocketContext from '../websocket/WebSocketContext';
+import React, { useContext, useState, useEffect } from "react";
+import WebSocketContext from "../websocket/WebSocketContext";
+import Back from "../components/gui/Back/Back";
 
 function Pampes() {
   const { send, message, readyState } = useContext(WebSocketContext);
@@ -79,116 +80,139 @@ function Pampes() {
   return (
     <div>
       <header className="text-center mb-4">
-        <h1>Ручное управление</h1>
+        <h1 className="display-3"> Управление</h1>
       </header>
       <div>
-        <ul className="list-group">
-          {/* Автомат */}
-          <li className="list-group-item d-flex flex-row flex-md-row justify-content-between align-items-center">
-            <div className="d-flex align-items-center mb-2 mb-md-0">
-              <h4 className="me-2 position-relative">Автомат {avtomat.name}</h4>
-            </div>
-            <div>
-              {avtomat.status == "on" && (
-                <span className="badge bg-success"> </span>
-              )}{" "}
-              {avtomat.status == "off" && (
-                <span className="badge bg-warning"> </span>
-              )}{" "}
-              {avtomat.status == "off" && (
-                <button
-                  type="button"
-                  className="btn btn-link"
-                  onClick={() => handleClickAvtomate(avtomat.name, "on")}
-                >
-                  Включить
-                </button>
-              )}
-              {avtomat.status == "on" && (
-                <button
-                  type="button"
-                  className="btn btn-link"
-                  onClick={() => handleClickAvtomate(avtomat.name, "off")}
-                >
-                  Выключить
-                </button>
-              )}
-            </div>
-          </li>
-
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2">
           {/* Насосы  */}
+          <div class="col">
+            <div class="card align-items-center border-0">
+              <Back></Back>
+              <img
+                src="/img/pump.png"
+                class="card-img-top"
+                alt="..."
+                style={{ width: "30%", opacity:"0" }}
+              />
+              <div class="card-body">
+                <h5 class="card-title">
+                  {avtomat.status == "on" && (
+                    <span className="badge bg-success"> </span>
+                  )}{" "}
+                  {avtomat.status == "off" && (
+                    <span className="badge bg-warning"> </span>
+                  )}{" "}
+                </h5>
+
+                <div class="btn-group-vertical gap-1">
+                  <button
+                    type="button"
+                    className="btn btn-info p-1"
+                    style={{ fontSize: "12px" }}
+                    onClick={() => handleClickAvtomate(avtomat.name, "on")}
+                  >
+                    Автомат
+                  </button>
+                  <button
+                    type="button"
+                    style={{ fontSize: "12px" }}
+                    className="btn btn-info p-1"
+                    onClick={() => handleClickAvtomate(avtomat.name, "off")}
+                  >
+                    Ручное управление
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {pamps.map(({ name, value }, i) => (
-            <li
-              key={i}
-              className="list-group-item d-flex flex-row flex-md-row justify-content-between align-items-center"
-            >
-              <div className="d-flex align-items-center mb-2 mb-md-0">
-                <h4 className="me-2 position-relative">Насос {name}</h4>
-              </div>
-              <div>
-                {value == "on" && <span className="badge bg-success"> </span>}{" "}
-                {value == "off" && <span className="badge bg-warning"> </span>}{" "}
-                {value == "off" && (
-                  <button
-                    type="button"
-                    style={{ width: "110px" }}
-                    className="btn btn-link"
-                    onClick={() => handleClickPamp(name, "on")}
-                  >
-                    Включить
-                  </button>
-                )}
-                {value == "on" && (
-                  <button
-                    type="button"
-                    style={{ width: "110px" }}
-                    className="btn btn-link"
-                    onClick={() => handleClickPamp(name, "off")}
-                  >
-                    Выключить
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
+            <div class="col" key={i}>
+              <div class="card align-items-center pt-2 border-0">
+                <img
+                  src="/img/pump.png"
+                  class="card-img-top"
+                  alt="..."
+                  style={{ width: "50%" }}
+                />
+                <div class="card-body">
+                  <h5 class="card-title">
+                    {value == "on" && (
+                      <span className="badge bg-success"> </span>
+                    )}{" "}
+                    {value == "off" && (
+                      <span className="badge bg-warning"> </span>
+                    )}{" "}
+                  </h5>
 
+                  <div class="btn-group-vertical gap-1">
+                    <button
+                      type="button"
+                      className="btn btn-info p-1"
+                      style={{ fontSize: "12px" }}
+                      onClick={() => handleClickPamp(name, "on")}
+                    >
+                      Включить насос {name}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-info p-1"
+                      style={{ fontSize: "12px" }}
+                      onClick={() => handleClickPamp(name, "off")}
+                    >
+                      Выключить насос {name}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mt-3">
           {/* Клапаны  */}
-
           {valves.map(({ name, status }, i) => (
-            <li
-              key={i}
-              className="list-group-item d-flex flex-row flex-md-row justify-content-between align-items-center"
-            >
-              <div className="d-flex align-items-center mb-2 mb-md-0">
-                <h4 className="me-2 position-relative">Клапан {name}</h4>
+            <div class="col" key={i}>
+              <div class="card align-items-center border-0">
+                <img
+                  src="/img/valve.png"
+                  class="card-img-top"
+                  alt="..."
+                  style={{ width: "50%" }}
+                />
+                <div class="card-body p-2">
+                  <h5 class="card-title">
+                    {status == "on" && (
+                      <span className="badge bg-success"> </span>
+                    )}{" "}
+                    {status == "off" && (
+                      <span className="badge bg-warning"> </span>
+                    )}{" "}
+                  </h5>
+
+                  <div class="btn-group-vertical gap-1">
+                    <button
+                      type="button"
+                      className="btn btn-info p-1"
+                      style={{ fontSize: "12px" }}
+                      onClick={() => handleClickValve(name, "on")}
+                    >
+                      Включить группу {name}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-info p-1"
+                      style={{ fontSize: "12px" }}
+                      onClick={() => handleClickValve(name, "off")}
+                    >
+                      Выключить группу {name}
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div>
-                {status == "on" && <span className="badge bg-success"> </span>}{" "}
-                {status == "off" && <span className="badge bg-warning"> </span>}{" "}
-                {status == "off" && (
-                  <button
-                    type="button"
-                    style={{ width: "110px" }}
-                    className="btn btn-link"
-                    onClick={() => handleClickValve(name, "on")}
-                  >
-                    Включить
-                  </button>
-                )}
-                {status == "on" && (
-                  <button
-                    type="button"
-                    style={{ width: "110px" }}
-                    className="btn btn-link"
-                    onClick={() => handleClickValve(name, "off")}
-                  >
-                    Выключить
-                  </button>
-                )}
-              </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
