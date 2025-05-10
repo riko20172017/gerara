@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import WebSocketContext from '../websocket/WebSocketContext';
+import WebSocketContext from "../websocket/WebSocketContext";
 import InputTimer from "../components/InputTimer";
-
+import Back from "../components/gui/Back/Back";
 
 function Valves() {
   const { send, message, readyState } = useContext(WebSocketContext);
@@ -43,9 +43,12 @@ function Valves() {
   };
 
   return (
-    <div className="container mt-5">
+    <div>
       <header className="text-center mb-4">
-        <h1>Длительность полива</h1>
+        <div className="d-flex align-items-center mb-2 mb-md-0">
+          <Back></Back>
+          <h2 className="me-2">Длительность полива</h2>
+        </div>
       </header>
       <div>
         <ul className="list-group">

@@ -36,7 +36,7 @@ export default function Meters() {
   }, []);
 
   return (
-    <div className="container py-4">
+    <div className="py-4">
       <h1 className="text-center mb-4">IoT Счетчики</h1>
       <div className="row g-4">
         {meters.map((meter, index) => (

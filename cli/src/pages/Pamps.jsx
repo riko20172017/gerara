@@ -77,7 +77,7 @@ function Pampes() {
   };
 
   return (
-    <div className="container mt-5">
+    <div>
       <header className="text-center mb-4">
         <h1>Ручное управление</h1>
       </header>
@@ -98,7 +98,6 @@ function Pampes() {
               {avtomat.status == "off" && (
                 <button
                   type="button"
-                  style={{ width: "110px" }}
                   className="btn btn-link"
                   onClick={() => handleClickAvtomate(avtomat.name, "on")}
                 >
@@ -108,7 +107,6 @@ function Pampes() {
               {avtomat.status == "on" && (
                 <button
                   type="button"
-                  style={{ width: "110px" }}
                   className="btn btn-link"
                   onClick={() => handleClickAvtomate(avtomat.name, "off")}
                 >

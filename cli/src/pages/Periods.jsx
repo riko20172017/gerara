@@ -1,6 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
-import WebSocketContext from '../websocket/WebSocketContext';
+import React, { useContext, useState, useEffect } from "react";
+import WebSocketContext from "../websocket/WebSocketContext";
 import InputTimer from "../components/InputTimer";
+import Back from "../components/gui/Back/Back";
 
 function Valves() {
   const { send, message, readyState } = useContext(WebSocketContext);
@@ -58,47 +59,51 @@ function Valves() {
   };
 
   return (
-    <div className="container mt-5">
+    <div>
       <header className="text-center mb-4">
-        <h1>Периоды</h1>
-      </header>
-      <div>
-        <div className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center">
-          <div className="d-flex align-items-center mb-2 mb-md-0">
-            <h4 className="me-2">Количество периодов</h4>
+        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center text-light gap-1">
+          <Back></Back>
+          <div className="flex-fill">
+            <InputTimer
+              label="Количество периодов"
+              avalue={periods.length}
+              itemId={0}
+              handleClick={handlePeriodLength}
+              state={0}
+              min={1}
+              max={5}
+              type="number"
+            />
           </div>
-          <InputTimer
-            avalue={periods.length}
-            itemId={0}
-            handleClick={handlePeriodLength}
-            state={0}
-            min={1}
-            max={5}
-            type="number"
-          />
         </div>
-        <ul className="list-group">
-          {periods.periods.map(({ name, value }, index) => (
-            <li
-              key={index}
-              className="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center"
-            >
-              <div className="d-flex align-items-center mb-2 mb-md-0">
-                <h4 className="me-2">Период {name}</h4>
-              </div>
-              <InputTimer
-                type="time"
-                avalue={value}
-                itemId={name}
-                handleClick={handlePeriods}
-                min="0:0"
-                max="23:59"
-                state="00:00"
-              />
-            </li>
-          ))}
-        </ul>
+      </header>
+      <div className="row align-items-start gx-1">
+        <div className="col-3 d-none d-sm-block">
+          <h1 className="text-center mb-4 text-light bg-dark">Герара</h1>
+        </div>
+        <div className="col-12 col-sm-9">
+          <ul className="text-light m-0 p-0">
+            {periods.periods.map(({ name, value }, index) => (
+              <li
+                key={index}
+                className="list-group-item d-flex flex-column align-items-center align-items-sm-stretch"
+              >
+                <InputTimer
+                  label={`Период ${name}`}
+                  type="time"
+                  avalue={value}
+                  itemId={name}
+                  handleClick={handlePeriods}
+                  min="0:0"
+                  max="23:59"
+                  state="00:00"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
+      <div></div>
     </div>
   );
 }
