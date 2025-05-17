@@ -4,6 +4,9 @@ services:
     container_name: cli
     volumes:
       - cli:/cli
+      - ./cli/nginx-conf:/etc/nginx/conf.d
+    ports:
+      - "3000:80"
   api:
     image: riko2018/iot-api
     container_name: api
@@ -76,13 +79,12 @@ services:
     container_name: webserver
     restart: unless-stopped
     ports:
-      - "80:80"
+      # - "80:80"
       - "443:443"
     volumes:
       - wordpress:/var/www/html
       - ./wp/nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
-      - cli:/cli
 
   # certbot:
   #   depends_on:

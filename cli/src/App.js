@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
@@ -9,7 +9,6 @@ import Periods from "./pages/Periods";
 import NoPage from "./pages/NoPage";
 
 function App() {
-
   return (
     <BrowserRouter>
       <Routes>

@@ -11,7 +11,6 @@
     "bootstrap": "^5.3.5",
     "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.4.9",
-    "craco": "^0.0.3",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.9",
     "react-chartjs-2": "^5.3.0",
