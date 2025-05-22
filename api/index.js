@@ -17,7 +17,7 @@ const server = https.createServer({
 }, app);
 
 // 🎯 WebSocket-сервер вручную
-const wss = new WebSocketServer({port: 7000}); 
+const wss = new WebSocketServer({ port: 7000 });
 
 async function setup() {
   try {
@@ -30,9 +30,9 @@ async function setup() {
     setupMqttClient(mqttClient, wss, db);
     setupWebSocket(mqttClient, wss, db);
 
-    // server.listen(7000, () => {
-    //   console.log('✅ HTTPS + WebSocket сервер слушает порт 7000');
-    // });
+    server.listen(8000, () => {
+      console.log('✅ HTTPS сервер слушает порт 8000');
+    });
 
   } catch (err) {
     console.error("Ошибка запуска:", err);
