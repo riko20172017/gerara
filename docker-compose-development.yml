@@ -99,7 +99,7 @@ services:
       - "443:443"
     volumes:
       - wordpress:/var/www/html
-      - ./wp/nginx-conf-dev:/etc/nginx/conf.d
+      - ./wp/nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
 
 volumes:
