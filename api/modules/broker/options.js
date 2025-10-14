@@ -1,5 +1,5 @@
 module.exports = {
-  url: `mqtt://${process.env.BROKER_IP}:1883`,
+  url: `mqtt://185.221.155.147:1883`,
   options: {
     clientId: `mqtt_${Math.random().toString(16).slice(3)}`,
     clean: true,

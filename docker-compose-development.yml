@@ -1,36 +1,4 @@
 services:
-  cli:
-    build:
-      context: ./cli
-      dockerfile: Dockerfile
-      target: development
-    container_name: cli
-    # ports:
-    #   - "80:3000"
-    #   - "3000:3000"
-    volumes:
-      - ./cli:/cli
-      - /cli/node_modules
-    stdin_open: true
-    tty: true
-  api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-      target: development
-    container_name: api
-    restart: always
-    ports:
-      - "8000:8000"
-      - "7000:7000"
-    volumes:
-      - ./api:/api
-      - /api/node_modules
-    depends_on:
-      broker:
-        condition: service_started
-      mongo:
-        condition: service_healthy
   broker:
     image: eclipse-mosquitto
     container_name: broker
@@ -82,11 +50,6 @@ services:
       - WORDPRESS_DB_NAME=wordpress
     volumes:
       - wordpress:/var/www/html
-      - certbot-etc:/etc/letsencrypt
-      # - cli:/var/www/html/wp-content/plugins/gerarareact/frontend
-      # - ./wp/apache-ssl.conf:/etc/apache2/sites-available/000-default.conf
-      # - ./wp/gerarareact:/var/www/html/wp-content/plugins/gerarareact
-    # command: bash -c "a2enmod ssl && apache2-foreground"
 
   webserver:
     depends_on:
@@ -99,8 +62,8 @@ services:
       - "443:443"
     volumes:
       - wordpress:/var/www/html
-      - ./wp/nginx-conf:/etc/nginx/conf.d
-      - certbot-etc:/etc/letsencrypt
+      - ./webserver/nginx-conf:/etc/nginx/conf.d
+      - certs:/etc/ssl/private
 
 volumes:
   mongo:
@@ -109,3 +72,4 @@ volumes:
   wordpress:
   dbdata:
   cli:
+  certs:

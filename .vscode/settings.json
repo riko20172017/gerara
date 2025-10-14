@@ -10,5 +10,6 @@
             "port": 1883,
             "clientId": "vsmqtt_client_885f"
         }
-    ]
+    ],
+    "makefile.configureOnOpen": false
 }

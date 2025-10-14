@@ -9,6 +9,7 @@ import Periods from "./pages/Periods";
 import NoPage from "./pages/NoPage";
 
 function App() {
+  console.log(process.env.NODE_ENV)
   return (
     <BrowserRouter>
       <Routes>

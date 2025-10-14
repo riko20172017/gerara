@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import useWebSocket from "react-use-websocket";
 import WebSocketContext from "./WebSocketContext";
 
-const WS_URL = `wss://gerara.ru/ws`; // пример, замените на свой
+const WS_URL = `ws://localhost:7000/ws`; // пример, замените на свой
 
 export const WebSocketProvider = ({ children }) => {
   const { sendJsonMessage: send, lastJsonMessage: message, readyState } = useWebSocket(

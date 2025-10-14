@@ -6,18 +6,7 @@ WORKDIR /cli
 COPY package.json package-lock.json ./
 RUN npm ci --frozen-lockfile
 
-# Stage 2: Development environment -------------------------------------------
-FROM node:18-alpine AS development
-WORKDIR /cli
-COPY --from=deps /cli/node_modules ./node_modules
-COPY . ./
-EXPOSE $PORT
-ENV REACT_APP_ENV=development
-ENV REACT_APP_API_IP=127.0.0.1
-ENV REACT_APP_API_PORT=8000
-CMD ["npm", "start"]
-
-# Stage 1: Build the React app
+# Stage 2: Build the React app
 FROM node:18-alpine AS build
 WORKDIR /cli
 COPY --from=deps /cli/node_modules ./node_modules
