@@ -41,17 +41,47 @@ module.exports = (broker, wss, db) => {
           getPamps(ws);
           break;
         case "set/pamp/request":
-          broker.publish(
-            "nasos" + response.name,
-            response.value,
-            options,
-            errorHandler
-          );
+          let data = "";
+          switch (response.name) {
+            case "1":
+              response.value === "on" ? (data = "b11") : (data = "b22");
+              break;
+            case "2":
+              response.value === "on" ? (data = "b31") : (data = "b42");
+              break;
+            case "3":
+              response.value === "on" ? (data = "b51") : (data = "b52");
+              break;
+          }
+          broker.publish("nasos" + response.name, data, options, errorHandler);
           break;
         case "set/valve/status/request":
+          let valveData = "";
+          switch (response.name) {
+            case "1":
+              response.value === "on"
+                ? (valveData = "k11")
+                : (valveData = "k22");
+              break;
+            case "2":
+              response.value === "on"
+                ? (valveData = "k31")
+                : (valveData = "k42");
+              break;
+            case "3":
+              response.value === "on"
+                ? (valveData = "k51")
+                : (valveData = "k62");
+              break;
+            case "4":
+              response.value === "on"
+                ? (valveData = "k71")
+                : (valveData = "k82");
+              break;
+          }
           broker.publish(
             "valve" + response.name,
-            response.value,
+            valveData,
             options,
             errorHandler
           );

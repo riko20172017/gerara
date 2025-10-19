@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import WebSocketContext from "../websocket/WebSocketContext";
 import Back from "../components/gui/Back/Back";
-import pumpImg from '../components/Pump/pump.png';
-import valveImg from '../components/Valve/valve.png';
+import pumpImg from "../components/Pump/pump.png";
+import valveImg from "../components/Valve/valve.png";
 
 function Pampes() {
   const { send, message, readyState } = useContext(WebSocketContext);
@@ -85,33 +85,35 @@ function Pampes() {
         <h1 className="display-3"> Управление</h1>
       </header>
       <div>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2">
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2">
           {/* Насосы  */}
-          <div class="col">
-            <div class="card align-items-center border-0">
+          <div className="col">
+            <div className="card align-items-center border-0">
               <Back></Back>
               <img
                 src={pumpImg}
-                class="card-img-top"
+                className="card-img-top"
                 alt="..."
                 style={{ width: "30%", opacity: "0" }}
               />
-              <div class="card-body">
-                <h5 class="card-title">
-                  {avtomat.status == "on" && (
+              <div className="card-body">
+                <h5 className="card-title">
+                  {avtomat.status === "on" && (
                     <span className="badge bg-success"> </span>
                   )}{" "}
-                  {avtomat.status == "off" && (
+                  {avtomat.status === "off" && (
                     <span className="badge bg-warning"> </span>
                   )}{" "}
                 </h5>
 
-                <div class="btn-group-vertical gap-1">
+                <div className="btn-group-vertical gap-1">
                   <button
                     type="button"
                     className="btn btn-info p-1"
                     style={{ fontSize: "12px" }}
-                    onClick={() => handleClickAvtomate(avtomat.name, "on")}
+                    onClick={() =>
+                      handleClickAvtomate(avtomat.name, "p11")
+                    }
                   >
                     Автомат
                   </button>
@@ -119,7 +121,9 @@ function Pampes() {
                     type="button"
                     style={{ fontSize: "12px" }}
                     className="btn btn-info p-1"
-                    onClick={() => handleClickAvtomate(avtomat.name, "off")}
+                    onClick={() =>
+                      handleClickAvtomate(avtomat.name, "p22")
+                    }
                   >
                     Ручное управление
                   </button>
@@ -129,25 +133,25 @@ function Pampes() {
           </div>
 
           {pamps.map(({ name, value }, i) => (
-            <div class="col" key={i}>
-              <div class="card align-items-center pt-2 border-0">
+            <div className="col" key={i}>
+              <div className="card align-items-center pt-2 border-0">
                 <img
                   src={pumpImg}
-                  class="card-img-top"
+                  className="card-img-top"
                   alt="..."
                   style={{ width: "50%" }}
                 />
-                <div class="card-body">
-                  <h5 class="card-title">
-                    {value == "on" && (
+                <div className="card-body">
+                  <h5 className="card-title">
+                    {value === "on" && (
                       <span className="badge bg-success"> </span>
                     )}{" "}
-                    {value == "off" && (
+                    {value === "off" && (
                       <span className="badge bg-warning"> </span>
                     )}{" "}
                   </h5>
 
-                  <div class="btn-group-vertical gap-1">
+                  <div className="btn-group-vertical gap-1">
                     <button
                       type="button"
                       className="btn btn-info p-1"
@@ -171,28 +175,28 @@ function Pampes() {
           ))}
         </div>
 
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mt-3">
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mt-3">
           {/* Клапаны  */}
           {valves.map(({ name, status }, i) => (
-            <div class="col" key={i}>
-              <div class="card align-items-center border-0">
+            <div className="col" key={i}>
+              <div className="card align-items-center border-0">
                 <img
                   src={valveImg}
-                  class="card-img-top"
+                  className="card-img-top"
                   alt="..."
                   style={{ width: "50%" }}
                 />
-                <div class="card-body p-2">
-                  <h5 class="card-title">
-                    {status == "on" && (
+                <div className="card-body p-2">
+                  <h5 className="card-title">
+                    {status === "on" && (
                       <span className="badge bg-success"> </span>
                     )}{" "}
-                    {status == "off" && (
+                    {status === "off" && (
                       <span className="badge bg-warning"> </span>
                     )}{" "}
                   </h5>
 
-                  <div class="btn-group-vertical gap-1">
+                  <div className="btn-group-vertical gap-1">
                     <button
                       type="button"
                       className="btn btn-info p-1"
