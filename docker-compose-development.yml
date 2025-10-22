@@ -68,8 +68,6 @@ services:
 volumes:
   mongo:
   api:
-  certbot-etc:
   wordpress:
   dbdata:
-  cli:
   certs:

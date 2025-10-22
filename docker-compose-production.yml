@@ -67,10 +67,6 @@ services:
     volumes:
       - wordpress:/var/www/html
       - certbot-etc:/etc/letsencrypt
-      # - cli:/var/www/html/wp-content/plugins/gerarareact/frontend
-      # - ./wp/apache-ssl.conf:/etc/apache2/sites-available/000-default.conf
-      # - ./wp/gerarareact:/var/www/html/wp-content/plugins/gerarareact
-    # command: bash -c "a2enmod ssl && apache2-foreground"
 
   webserver:
     depends_on:
@@ -85,16 +81,6 @@ services:
       - wordpress:/var/www/html
       - ./wp/nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
-
-  # certbot:
-  #   depends_on:
-  #     - webserver
-  #   image: certbot/certbot
-  #   container_name: certbot
-  #   volumes:
-  #     - certbot-etc:/etc/letsencrypt
-  #     - wordpress:/var/www/html
-  #   command: certonly --webroot --webroot-path=/var/www/html --email sammy@your_domain --agree-tos --no-eff-email --force-renewal -d your_domain -d www.your_domain
 
 volumes:
   mongo:
