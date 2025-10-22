@@ -1,8 +1,6 @@
 services:
 
   certbot:
-    depends_on:
-      - webserver
     image: certbot/certbot
     container_name: certbot
     volumes:
