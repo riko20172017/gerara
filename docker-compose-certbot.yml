@@ -2,9 +2,19 @@ services:
   certbot:
     image: certbot/certbot:latest
     container_name: certbot
-    command: certonly --standalone --non-interactive --agree-tos \
-      -m admin@gerara.ru \
-      -d gerara.ru -d www.gerara.ru
+    command:
+      [
+        "certonly",
+        "--standalone",
+        "--non-interactive",
+        "--agree-tos",
+        "-m",
+        "admin@gerara.ru",
+        "-d",
+        "gerara.ru",
+        "-d",
+        "www.gerara.ru",
+      ]
     ports:
       - "80:80"
     volumes:
