@@ -2,15 +2,15 @@ services:
   certbot:
     image: certbot/certbot:latest
     container_name: certbot
+    command: certonly --standalone --non-interactive --agree-tos \
+      -m admin@gerara.ru \
+      -d gerara.ru -d www.gerara.ru
+    ports:
+      - "80:80"
     volumes:
       - certbot-etc:/etc/letsencrypt
       - ./logs:/var/log/letsencrypt
       - wordpress:/var/www/html
-    command: certonly --webroot --webroot-path=/var/www/html \
-      --email admin@gerara.ru --agree-tos \
-      --no-eff-email --force-renewal -d gerara.ru -d www.gerara.ru
-    ports:
-      - "80:80"
 
 volumes:
   certbot-etc:
