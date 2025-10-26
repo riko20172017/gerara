@@ -7,8 +7,6 @@ services:
       args:
         - ENVIRONMENT=local
     container_name: cli
-    ports:
-      - "3000:80"
   api:
     build:
       context: ./api
