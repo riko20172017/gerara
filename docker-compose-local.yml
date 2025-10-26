@@ -1,13 +1,29 @@
 services:
-  broker:
-    image: eclipse-mosquitto
-    container_name: broker
+  cli:
+    build:
+      context: ./cli
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - ENVIRONMENT=local
+    container_name: cli
     ports:
-      - 1883:1883
-    volumes:
-      - ./broker/config:/mosquitto/config
-      - ./broker/data:/mosquitto/data
-      - ./broker/log:/mosquitto/log
+      - "3000:80"
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - ENVIRONMENT=local
+    container_name: api
+    restart: always
+    ports:
+      - "8000:8000"
+      - "7000:7000"
+    depends_on:
+      mongo:
+        condition: service_healthy
   mongo:
     ports:
       - "27017:27017"
@@ -35,10 +51,9 @@ services:
       - dbdata:/var/lib/mysql
     command: "--default-authentication-plugin=mysql_native_password"
 
-  wordpress:
+  wp:
     depends_on:
       - db
-      # - cli
     image: wordpress
     container_name: wp
     restart: unless-stopped
@@ -48,26 +63,28 @@ services:
       - WORDPRESS_DB_USER=$MYSQL_USER
       - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
       - WORDPRESS_DB_NAME=wordpress
+      - WP_HOME=https://localhost
+      - WP_SITEURL=https://localhost
     volumes:
       - wordpress:/var/www/html
+      - ./wp/wp-config.php:/var/www/html/wp-config.php
 
-  webserver:
+  web:
     depends_on:
-      - wordpress
+      - wp
+      - api
     image: nginx:1.15.12-alpine
-    container_name: webserver
+    container_name: web
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - wordpress:/var/www/html
-      - ./webserver/nginx-conf:/etc/nginx/conf.d
+      - ./web/nginx-conf-local:/etc/nginx/conf.d
       - certs:/etc/ssl/private
 
 volumes:
   mongo:
-  api:
   wordpress:
   dbdata:
   certs:

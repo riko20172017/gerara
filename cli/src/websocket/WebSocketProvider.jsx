@@ -2,13 +2,19 @@ import React, { useMemo } from "react";
 import useWebSocket from "react-use-websocket";
 import WebSocketContext from "./WebSocketContext";
 
-const WS_URL = `ws://localhost:7000/ws`; // пример, замените на свой
+const API_DOMAIN =
+  process.env.REACT_APP_ENV === "remote" ? "gerara.ru" : "localhost";
+
+console.log("REACT_APP_ENV:", process.env.REACT_APP_ENV);
+
+const WS_URL = `ws://${API_DOMAIN}:7000/ws`; // пример, замените на свой
 
 export const WebSocketProvider = ({ children }) => {
-  const { sendJsonMessage: send, lastJsonMessage: message, readyState } = useWebSocket(
-    WS_URL,
-    { share: false, shouldReconnect: () => true }
-  );
+  const {
+    sendJsonMessage: send,
+    lastJsonMessage: message,
+    readyState,
+  } = useWebSocket(WS_URL, { share: false, shouldReconnect: () => true });
 
   const value = useMemo(
     () => ({

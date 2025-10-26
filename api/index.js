@@ -9,9 +9,12 @@ const setupWebSocket = require("./modules/socket/socket.js");
 
 const server = createServer({ noServer: true });
 
+const MONGO_DOMEN =
+  process.env.ENVIRONMENT === "remote" ? "mongo" : "localhost";
+
 async function setup() {
   try {
-    const mongo = new MongoClient(`mongodb://localhost:27017/`);
+    const mongo = new MongoClient(`mongodb://${MONGO_DOMEN}:27017/`);
     const connection = await mongo.connect();
     console.log("1. Подключение к mongo установлено");
 
