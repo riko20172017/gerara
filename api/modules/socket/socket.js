@@ -3,7 +3,7 @@ module.exports = (broker, wss, db) => {
 
   wss.on("connection", function connection(ws) {
     ws.on("error", console.error);
-
+    
     ws.on("message", function message(r) {
       const e = JSON.parse(r).event;
       const response = JSON.parse(r).data;

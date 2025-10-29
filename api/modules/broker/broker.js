@@ -139,7 +139,6 @@ module.exports = (client, wss, db) => {
     db.collection("pamps").updateOne({ name }, { $set: { value: value } });
 
     send({ event: "set/pamps/response", data: { name, value } });
-    console.log(1);
   }
 
   function handleValveStatus(topic, message) {

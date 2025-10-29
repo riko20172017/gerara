@@ -10,7 +10,7 @@ const setupWebSocket = require("./modules/socket/socket.js");
 const server = createServer({ noServer: true });
 
 const MONGO_DOMEN =
-  process.env.ENVIRONMENT === "remote" ? "mongo" : "localhost";
+  process.env.ENVIRONMENT === "dev" ? "localhost" : "mongo";
 
 async function setup() {
   try {

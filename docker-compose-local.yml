@@ -6,6 +6,7 @@ services:
       target: production
       args:
         - ENVIRONMENT=local
+    image: riko2018/gerara-cli
     container_name: cli
   api:
     build:
@@ -14,6 +15,7 @@ services:
       target: production
       args:
         - ENVIRONMENT=local
+    image: riko2018/gerara-api
     container_name: api
     restart: always
     ports:
@@ -71,14 +73,17 @@ services:
     depends_on:
       - wp
       - api
-    image: nginx:1.15.12-alpine
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      target: production
+    image: riko2018/gerara-web
     container_name: web
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./web/nginx-conf-local:/etc/nginx/conf.d
       - certs:/etc/ssl/private
 
 volumes:
