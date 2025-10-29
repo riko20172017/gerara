@@ -7,7 +7,7 @@ const API_DOMAIN =
 
 console.log("REACT_APP_ENV:", process.env.REACT_APP_ENV);
 
-const WS_URL = `ws://${API_DOMAIN}:7000/ws`; // пример, замените на свой
+const WS_URL = `ws://${API_DOMAIN}/ws/`; // пример, замените на свой
 
 export const WebSocketProvider = ({ children }) => {
   const {

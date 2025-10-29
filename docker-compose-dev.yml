@@ -3,7 +3,7 @@ services:
     ports:
       - "27017:27017"
     image: mongo
-    container_name: mongo
+    container_name: mongo-dev
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
       interval: 5s
@@ -15,7 +15,7 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: mysql
+    container_name: mysql-dev
     restart: unless-stopped
     env_file: .env
     ports:
@@ -30,7 +30,7 @@ services:
     depends_on:
       - db
     image: wordpress
-    container_name: wp
+    container_name: wp-dev
     restart: unless-stopped
     env_file: .env
     environment:
@@ -48,13 +48,13 @@ services:
     depends_on:
       - wp
     image: nginx:1.15.12-alpine
-    container_name: web
+    container_name: web-dev
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./web/nginx-conf-local:/etc/nginx/conf.d
+      - ./web/nginx-conf-dev:/etc/nginx/conf.d
       - certs:/etc/ssl/private
 
 volumes:
