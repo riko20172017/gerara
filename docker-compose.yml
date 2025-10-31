@@ -1,26 +1,45 @@
 services:
   cli:
-    image: riko2018/iot-cli
+    build:
+      context: ./cli
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - ENVIRONMENT=remote
+    image: riko2018/gerara-cli
     container_name: cli
-    volumes:
-      - cli:/cli
-      - ./cli/nginx-conf:/etc/nginx/conf.d
-    ports:
-      - "3000:80"
   api:
-    image: riko2018/iot-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - ENVIRONMENT=remote
+    image: riko2018/gerara-api
     container_name: api
     restart: always
     ports:
       - "8000:8000"
       - "7000:7000"
-    volumes:
-      - certbot-etc:/etc/letsencrypt
     depends_on:
       broker:
         condition: service_started
       mongo:
-        condition: service_started
+        condition: service_healthy
+  mongo:
+    ports:
+      - "27017:27017"
+    image: mongo
+    container_name: mongo
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - mongo:/data/db
+
   broker:
     container_name: broker
     image: eclipse-mosquitto
@@ -30,14 +49,6 @@ services:
       - ./broker/config:/mosquitto/config
       - ./broker/data:/mosquitto/data
       - ./broker/log:/mosquitto/log
-  mongo:
-    ports:
-      - "27017:27017"
-    image: mongo
-    container_name: mongo
-    volumes:
-      - mongo:/data/db
-
   db:
     image: mysql:8.0
     container_name: mysql
@@ -51,10 +62,9 @@ services:
       - dbdata:/var/lib/mysql
     command: "--default-authentication-plugin=mysql_native_password"
 
-  wordpress:
+  wp:
     depends_on:
       - db
-      # - cli
     image: wordpress
     container_name: wp
     restart: unless-stopped
@@ -64,28 +74,33 @@ services:
       - WORDPRESS_DB_USER=$MYSQL_USER
       - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
       - WORDPRESS_DB_NAME=wordpress
+      - WP_HOME=https://localhost
+      - WP_SITEURL=https://localhost
     volumes:
       - wordpress:/var/www/html
-      - certbot-etc:/etc/letsencrypt
+      - ./wp/wp-config.php:/var/www/html/wp-config.php
 
-  webserver:
+  web:
     depends_on:
-      - wordpress
-    image: nginx:1.15.12-alpine
-    container_name: webserver
+      - wp
+      - api
+    # build:
+    #   context: ./web
+    #   dockerfile: Dockerfile
+    #   target: production
+    # image: riko2018/gerara-web
+    container_name: web
     restart: unless-stopped
     ports:
-      # - "80:80"
+      - "80:80"
       - "443:443"
     volumes:
-      - wordpress:/var/www/html
-      - ./wp/nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
+      - certs:/etc/ssl/private
 
 volumes:
   mongo:
-  api:
-  certbot-etc:
   wordpress:
   dbdata:
-  cli:
+  certs:
+  certbot-etc:
