@@ -97,7 +97,7 @@ services:
       - "443:443"
     volumes:
       - certbot-etc:/etc/letsencrypt
-      - certs:/etc/ssl/private
+      - ./web/nginx-conf-remote:/etc/nginx/conf.d
 
 volumes:
   mongo:
