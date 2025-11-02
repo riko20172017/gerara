@@ -89,6 +89,7 @@ services:
     #   dockerfile: Dockerfile
     #   target: production
     # image: riko2018/gerara-web
+    image: nginx
     container_name: web
     restart: unless-stopped
     ports:
