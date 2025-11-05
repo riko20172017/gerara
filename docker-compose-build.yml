@@ -5,12 +5,13 @@ services:
       dockerfile: Dockerfile
       target: production
       args:
-        - ENVIRONMENT=local
+        - ENVIRONMENT=remote
     image: riko2018/gerara-cli
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
       target: production
+      args:
+        - ENVIRONMENT=remote
     image: riko2018/gerara-api
-  
