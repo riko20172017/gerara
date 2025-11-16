@@ -74,8 +74,8 @@ services:
       - WORDPRESS_DB_USER=$MYSQL_USER
       - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
       - WORDPRESS_DB_NAME=wordpress
-      - WP_HOME=https://localhost
-      - WP_SITEURL=https://localhost
+      - WP_HOME=https://gerara.ru
+      - WP_SITEURL=https://gerara.ru
     volumes:
       - wordpress:/var/www/html
       - ./wp/wp-config.php:/var/www/html/wp-config.php
