@@ -1,20 +1,8 @@
 services:
   cli:
-    build:
-      context: ./cli
-      dockerfile: Dockerfile
-      target: production
-      args:
-        - ENVIRONMENT=remote
     image: riko2018/gerara-cli
     container_name: cli
   api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-      target: production
-      args:
-        - ENVIRONMENT=remote
     image: riko2018/gerara-api
     container_name: api
     restart: always
