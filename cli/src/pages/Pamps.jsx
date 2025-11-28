@@ -88,7 +88,7 @@ function Pampes() {
       <div>
         <div className="row row-cols-1 row-cols-sm-1 row-cols-md-1 g-2">
           {/* Насосы  */}
-          <div className="col">
+          <div className="col mb-3">
             <div className="card align-items-center border-0">
               <div className="card-body">
                 <h5 className="card-title">
@@ -171,7 +171,7 @@ function Pampes() {
           ))}
         </div>
 
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mt-3">
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mt-3 mb-5">
           {/* Клапаны  */}
           {valves.map(({ name, status }, i) => (
             <div className="col" key={i}>
