@@ -86,7 +86,46 @@ function Pampes() {
         <h1 className="display-3"> Управление</h1>
       </header>
       <div>
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2">
+        <div className="row row-cols-1 row-cols-sm-1 row-cols-md-1 g-2">
+          {/* Насосы  */}
+          <div className="col">
+            <div className="card align-items-center border-0">
+              <div className="card-body">
+                <h5 className="card-title">
+                  <div
+                    className="alert text-bg-dark"
+                    style={{ fontSize: "12px" }}
+                    role="alert"
+                  >
+                    {avtomat.status === "automatic" && "Система на автомате"}{" "}
+                    {avtomat.status === "not automatic" && " Система на ручном"}{" "}
+                  </div>
+                </h5>
+
+                <div className="d-grid gap-1 gap-1">
+                  <button
+                    type="button"
+                    className="btn btn-primary p-1"
+                    style={{ fontSize: "12px" }}
+                    onClick={() => handleClickAvtomate(avtomat.name, "p11")}
+                  >
+                    Авто
+                  </button>
+                  <button
+                    type="button"
+                    style={{ fontSize: "12px" }}
+                    className="btn btn-danger p-1"
+                    onClick={() => handleClickAvtomate(avtomat.name, "p22")}
+                  >
+                    Ручное
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="row row-cols-1 row-cols-sm-3 row-cols-md-3 g-2">
           {/* Насосы  */}
 
           {pamps.map(({ name, value }, i) => (
@@ -175,45 +214,6 @@ function Pampes() {
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="row row-cols-1 row-cols-sm-1 row-cols-md-1 g-2">
-          {/* Насосы  */}
-          <div className="col">
-            <div className="card align-items-center border-0">
-              <div className="card-body">
-                <h5 className="card-title">
-                  <div
-                    className="alert text-bg-dark"
-                    style={{ fontSize: "12px" }}
-                    role="alert"
-                  >
-                    {avtomat.status === "automatic" && "Система на автомате"}{" "}
-                    {avtomat.status === "not automatic" && " Система на ручном"}{" "}
-                  </div>
-                </h5>
-
-                <div className="d-grid gap-1 gap-1">
-                  <button
-                    type="button"
-                    className="btn btn-primary p-1"
-                    style={{ fontSize: "12px" }}
-                    onClick={() => handleClickAvtomate(avtomat.name, "p11")}
-                  >
-                    Авто
-                  </button>
-                  <button
-                    type="button"
-                    style={{ fontSize: "12px" }}
-                    className="btn btn-danger p-1"
-                    onClick={() => handleClickAvtomate(avtomat.name, "p22")}
-                  >
-                    Ручное
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
