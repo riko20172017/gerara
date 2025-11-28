@@ -29,7 +29,7 @@ module.exports = (client, wss, db) => {
       case "vk4o":
         handleValveTime(topic, message);
         break;
-      case "k.p":
+      case "k.po":
         handlePeriodCount(topic, message);
         break;
       case "p1o":

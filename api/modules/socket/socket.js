@@ -50,7 +50,7 @@ module.exports = (broker, wss, db) => {
               response.value === "on" ? (data = "b31") : (data = "b42");
               break;
             case "3":
-              response.value === "on" ? (data = "b51") : (data = "b52");
+              response.value === "on" ? (data = "b51") : (data = "b62");
               break;
           }
           broker.publish("nasos" + response.name, data, options, errorHandler);
