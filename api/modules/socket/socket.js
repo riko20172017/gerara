@@ -3,7 +3,7 @@ module.exports = (broker, wss, db) => {
 
   wss.on("connection", function connection(ws) {
     ws.on("error", console.error);
-    
+
     ws.on("message", function message(r) {
       const e = JSON.parse(r).event;
       const response = JSON.parse(r).data;
@@ -22,6 +22,8 @@ module.exports = (broker, wss, db) => {
           break;
         case "get/meters/data/request":
           getMetersData(ws);
+        case "get/meter/request":
+          getMeterData(ws, response);
           break;
         case "set/periods/number":
           broker.publish("k.p", response, options, errorHandler);
@@ -109,75 +111,110 @@ module.exports = (broker, wss, db) => {
     const ec = db.collection("m.ec");
     const ph = db.collection("m.ph");
 
+    console.log(st.collectionName);
+
     const data = [
       {
         ...(await st.findOne({}, params)),
-        name: "Температура почвы",
+        title: "Температура почвы",
+        type: st.collectionName,
+        name: "",
       },
       {
         ...(await at.findOne({}, params)),
-        name: "Температура воздуха",
+        title: "Температура воздуха",
+        type: at.collectionName,
+        name: "",
       },
       {
         ...(await ah.findOne({}, params)),
-        name: "Влажность воздуха",
+        title: "Влажность воздуха",
+        type: ah.collectionName,
+        name: "",
       },
       {
         ...(await wf.findOne({ name: "4" }, params)),
-        name: "Расход воды клапан 4",
+        title: "Расход воды клапан 4",
+        type: wf.collectionName,
+        name: "4",
       },
       {
         ...(await wf.findOne({ name: "3" }, params)),
-        name: "Расход воды клапан 3",
+        title: "Расход воды клапан 3",
+        type: wf.collectionName,
+        name: "3",
       },
       {
         ...(await wf.findOne({ name: "2" }, params)),
-        name: "Расход воды клапан 2",
+        title: "Расход воды клапан 2",
+        type: wf.collectionName,
+        name: "2",
       },
       {
         ...(await wf.findOne({ name: "1" }, params)),
-        name: "Расход воды клапан 1",
+        title: "Расход воды клапан 1",
+        type: wf.collectionName,
+        name: "1",
       },
       {
         ...(await pp.findOne({}, params)),
-        name: "Давление после насосов",
+        title: "Давление после насосов",
+        type: pp.collectionName,
       },
       {
         ...(await fp.findOne({}, params)),
-        name: "Давление после фильтров",
+        title: "Давление после фильтров",
+        type: fp.collectionName,
       },
       {
         ...(await ec.findOne({}, params)),
-        name: "EC",
+        title: "EC",
+        type: ec.collectionName,
       },
       {
         ...(await ph.findOne({}, params)),
-        name: "PH",
+        title: "PH",
+        type: ph.collectionName,
       },
       {
         ...(await h.findOne({ name: "1" }, params)),
-        name: "Влажность почвы 1",
+        title: "Влажность почвы 1",
+        type: h.collectionName,
+        name: "1",
       },
       {
         ...(await h.findOne({ name: "2" }, params)),
-        name: "Влажность почвы 2",
+        title: "Влажность почвы 2",
+        type: h.collectionName,
+        name: "2",
       },
       {
         ...(await h.findOne({ name: "3" }, params)),
-        name: "Влажность почвы 3",
+        title: "Влажность почвы 3",
+        type: h.collectionName,
+        name: "3",
       },
       {
         ...(await h.findOne({ name: "4" }, params)),
-        name: "Влажность почвы 4",
+        title: "Влажность почвы 4",
+        type: h.collectionName,
+        name: "4",
       },
       {
         ...(await h.findOne({ name: "5" }, params)),
-        name: "Влажность почвы 5",
+        title: "Влажность почвы 5",
+        type: h.collectionName,
+        name: "5",
       },
     ];
 
     ws.send(JSON.stringify({ event: "get/meters/data/response", data }));
   };
+
+  const getMeterData = async (ws, response) => { 
+    console.log(response)
+    const collection = db.collection(response.type);
+  }
 
   const getValvesData = async (ws) => {
     const data = await db.collection("valves").find().toArray();

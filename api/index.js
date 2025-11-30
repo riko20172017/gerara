@@ -32,7 +32,7 @@ async function setup() {
     const mqttClient = mqtt.connect(mqttInits.url, mqttInits.options);
 
     setupMqttClient(mqttClient, wss, db); // инициализируем брокер mqtt
-    setupWebSocket(mqttClient, wss, db); // инициализируем WebSocket
+    setupWebSocket(mqttClient, wss, db) ; // инициализируем WebSocket
     server.listen(7000);
   } catch (err) {
     console.error("Ошибка подключения к MongoDB:", err);
