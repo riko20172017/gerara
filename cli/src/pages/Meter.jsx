@@ -11,6 +11,7 @@ export default function Meter() {
   // Handle WebSocket connection state
   useEffect(() => {
     if (readyState === 1) {
+      console.log("1");
       send({
         event: "get/meter/request",
         data: { type: meterType, name: meterName },
@@ -18,14 +19,18 @@ export default function Meter() {
     }
   }, [readyState]);
 
+  if (message.event === "get/meter/response") {
+    console.log(message);
+  }
   // Handle incoming WebSocket messages
-  useEffect(() => {
-    if (message) {
-      if (message.event === "get/meter/data/response") {
-        setMeter([...message.data]);
-      }
-    }
-  }, [message]);
+  // useEffect(() => {
+  //   console.log('2')
+  //   if (message) {
+  //     if (message.event === "get/meter/response") {
+  //       setMeter([...message.data]);
+  //     }
+  //   }
+  // }, [message]);
 
   return (
     <div className="py-4">

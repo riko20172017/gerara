@@ -22,6 +22,7 @@ module.exports = (broker, wss, db) => {
           break;
         case "get/meters/data/request":
           getMetersData(ws);
+          break;
         case "get/meter/request":
           getMeterData(ws, response);
           break;
@@ -111,8 +112,6 @@ module.exports = (broker, wss, db) => {
     const ec = db.collection("m.ec");
     const ph = db.collection("m.ph");
 
-    console.log(st.collectionName);
-
     const data = [
       {
         ...(await st.findOne({}, params)),
@@ -160,21 +159,25 @@ module.exports = (broker, wss, db) => {
         ...(await pp.findOne({}, params)),
         title: "Давление после насосов",
         type: pp.collectionName,
+        name: "",
       },
       {
         ...(await fp.findOne({}, params)),
         title: "Давление после фильтров",
         type: fp.collectionName,
+        name: "",
       },
       {
         ...(await ec.findOne({}, params)),
         title: "EC",
         type: ec.collectionName,
+        name: "",
       },
       {
         ...(await ph.findOne({}, params)),
         title: "PH",
         type: ph.collectionName,
+        name: "",
       },
       {
         ...(await h.findOne({ name: "1" }, params)),
@@ -211,10 +214,24 @@ module.exports = (broker, wss, db) => {
     ws.send(JSON.stringify({ event: "get/meters/data/response", data }));
   };
 
-  const getMeterData = async (ws, response) => { 
-    console.log(response)
-    const collection = db.collection(response.type);
-  }
+  const getMeterData = async (ws, response) => {
+    const collectionName = response.type;
+    const collection = db.collection(collectionName);
+    const name = response.name;
+    let data = [];
+
+    if (name !== "-1") {
+      data = await collection
+        .find({ name: name })
+        .sort({ _id: -1 }) // ← сортируем от новых к старым
+        .limit(10) // ← последние 10
+        .toArray();
+    } else {
+      data = await collection.find().sort({ _id: -1 }).limit(10).toArray();
+    }
+
+    ws.send(JSON.stringify({ event: "get/meter/response", data }));
+  };
 
   const getValvesData = async (ws) => {
     const data = await db.collection("valves").find().toArray();
