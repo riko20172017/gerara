@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import WebSocketContext from "./WebSocketContext";
 
@@ -20,14 +20,34 @@ export const WebSocketProvider = ({ children }) => {
     readyState,
   } = useWebSocket(WS_URL, { share: false, shouldReconnect: () => true });
 
+  const [data, setData] = useState({
+    valves: [],
+    pressure: null,
+    humidity: null,
+    alerts: null,
+  });
+
+  useEffect(() => {
+    if (!message) return;
+
+    switch (message.event) {
+      case "valves":
+        setData((prev) => ({ ...prev, valves: message.data }));
+        break;
+
+      default:
+    }
+  }, [message]);
+
   const value = useMemo(
     () => ({
       send,
-      message,
       readyState,
+      ...data,
     }),
-    [send, message, readyState]
+    [send, readyState, data]
   );
+  // console.log(JSON.stringify(data.valves, null, 2));
 
   return (
     <WebSocketContext.Provider value={value}>

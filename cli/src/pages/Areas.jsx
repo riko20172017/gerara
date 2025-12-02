@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
-import WebSocketContext from "../websocket/WebSocketContext";
+// import WebSocketContext from "../websocket/WebSocketContext";
 import Back from "../components/gui/Back/Back";
 
 function Areas() {
-  const { send, message, readyState } = useContext(WebSocketContext);
+  // const { send, message, readyState } = useContext(WebSocketContext);
   // const [periods, setPeriods] = useState({ length: 0, periods: [] });
 
   // // Handle WebSocket connection state

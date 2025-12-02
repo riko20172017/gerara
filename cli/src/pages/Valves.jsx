@@ -1,39 +1,37 @@
-import React, { useState, useEffect, useContext } from "react";
-import WebSocketContext from "../websocket/WebSocketContext";
+import React, { useEffect } from "react";
 import InputTimer from "../components/InputTimer";
 import Back from "../components/gui/Back/Back";
+import { useValves, useWSSend, useReady } from "../websocket/WsSelectors";
 
 function Valves() {
-  const { send, message, readyState } = useContext(WebSocketContext);
-  const [valves, setValves] = useState([]);
+  const valves = useValves();
+  const send = useWSSend();
+  const ready = useReady();
 
-  // Handle WebSocket connection state
+  //Handle WebSocket connection state
   useEffect(() => {
-    if (readyState === 1) {
-      send({
-        event: "get/valves/request",
-        data: {},
-      });
+    if (ready) {
+      send({ action: "get_valves" });
     }
-  }, [readyState]);
+  }, [send, ready]);
 
-  //Handle incoming WebSocket messages
-  useEffect(() => {
-    if (message && message.event && message.data) {
-      const { event, data } = message;
-      if (event === "get/valves/response") setValves([...data]); // Assuming the response is an array of objects
-      if (event === "valve/time") {
-        const nextValves = valves.map((v, i) => {
-          if (v.name === data.name) {
-            return data;
-          } else {
-            return v;
-          }
-        });
-        setValves(nextValves);
-      }
-    }
-  }, [message]);
+  // //Handle incoming WebSocket messages
+  // useEffect(() => {
+  //   if (message && message.event && message.data) {
+  //     const { event, data } = message;
+  //     if (event === "get/valves/response") setValves([...data]); // Assuming the response is an array of objects
+  //     if (event === "valve/time") {
+  //       const nextValves = valves.map((v, i) => {
+  //         if (v.name === data.name) {
+  //           return data;
+  //         } else {
+  //           return v;
+  //         }
+  //       });
+  //       setValves(nextValves);
+  //     }
+  //   }
+  // }, [message]);
 
   const handleClick = (name, time) => {
     send({
@@ -41,6 +39,8 @@ function Valves() {
       data: { name, time },
     });
   };
+
+  console.log('1')
 
   return (
     <div>
@@ -76,9 +76,7 @@ function Valves() {
         </ul>
         <div className="text-left">
           <div className="d-flex flex-column flex-sm-row text-light gap-1">
-            <span
-              className="flex-fill text-light bg-dark m-0 p-2"
-            >
+            <span className="flex-fill text-light bg-dark m-0 p-2">
               Общее время полива:{" "}
               {valves.reduce(
                 (total, valve) => parseInt(total) + parseInt(valve.time),

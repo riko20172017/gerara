@@ -1,93 +1,91 @@
 import React, { useContext, useState, useEffect } from "react";
-import WebSocketContext from "../websocket/WebSocketContext";
 import Back from "../components/gui/Back/Back";
 import pumpImg from "../components/Pump/pump.png";
 import valveImg from "../components/Valve/valve.png";
 
 function Pampes() {
-  const { send, message, readyState } = useContext(WebSocketContext);
-  const [pamps, setPamps] = useState([]);
-  const [valves, setValves] = useState([]);
-  const [avtomat, setAvtomat] = useState({});
+  // const { send, message, readyState } = useContext(WebSocketContext);
+  // const [pamps, setPamps] = useState([]);
+  // const [valves, setValves] = useState([]);
+  // const [avtomat, setAvtomat] = useState({});
 
-  // Handle WebSocket connection state
-  useEffect(() => {
-    if (readyState === 1) {
-      send({
-        event: "get/pamps/request",
-      });
-      send({
-        event: "get/valves/request",
-      });
-      send({
-        event: "get/avtomat/request",
-      });
-    }
-  }, [readyState]);
+  // // Handle WebSocket connection state
+  // useEffect(() => {
+  //   if (readyState === 1) {
+  //     send({
+  //       event: "get/pamps/request",
+  //     });
+  //     send({
+  //       event: "get/valves/request",
+  //     });
+  //     send({
+  //       event: "get/avtomat/request",
+  //     });
+  //   }
+  // }, [readyState]);
 
-  //Handle incoming WebSocket messages
-  useEffect(() => {
-    if (message && message.event && message.data) {
-      const { event, data } = message;
-      if (event === "get/pamps/response") setPamps([...data]); // Assuming the response is an array of objects
-      if (event === "set/pamps/response") {
-        const nextPamps = pamps.map((pamp, i) => {
-          if (pamp.name === data.name) {
-            return data;
-          } else {
-            return pamp;
-          }
-        });
-        setPamps(nextPamps);
-      }
-      if (event === "get/valves/response") setValves([...data]);
-      if (event === "set/valve/status/response") {
-        const nextValves = valves.map((valve, i) => {
-          if (valve.name === data.name) {
-            return data;
-          } else {
-            return valve;
-          }
-        });
-        setValves(nextValves);
-      }
-      if (event === "get/avtomat/response") setAvtomat({ ...data });
-      if (event === "set/avtomat/status/response") {
-        setAvtomat({ ...data });
-      }
-    }
-  }, [message]);
+  // //Handle incoming WebSocket messages
+  // useEffect(() => {
+  //   if (message && message.event && message.data) {
+  //     const { event, data } = message;
+  //     if (event === "get/pamps/response") setPamps([...data]); // Assuming the response is an array of objects
+  //     if (event === "set/pamps/response") {
+  //       const nextPamps = pamps.map((pamp, i) => {
+  //         if (pamp.name === data.name) {
+  //           return data;
+  //         } else {
+  //           return pamp;
+  //         }
+  //       });
+  //       setPamps(nextPamps);
+  //     }
+  //     if (event === "get/valves/response") setValves([...data]);
+  //     if (event === "set/valve/status/response") {
+  //       const nextValves = valves.map((valve, i) => {
+  //         if (valve.name === data.name) {
+  //           return data;
+  //         } else {
+  //           return valve;
+  //         }
+  //       });
+  //       setValves(nextValves);
+  //     }
+  //     if (event === "get/avtomat/response") setAvtomat({ ...data });
+  //     if (event === "set/avtomat/status/response") {
+  //       setAvtomat({ ...data });
+  //     }
+  //   }
+  // }, [message]);
 
-  const handleClickPamp = (name, value) => {
-    send({
-      event: "set/pamp/request",
-      data: { name, value },
-    });
-  };
+  // const handleClickPamp = (name, value) => {
+  //   send({
+  //     event: "set/pamp/request",
+  //     data: { name, value },
+  //   });
+  // };
 
-  const handleClickValve = (name, value) => {
-    send({
-      event: "set/valve/status/request",
-      data: { name, value },
-    });
-  };
+  // const handleClickValve = (name, value) => {
+  //   send({
+  //     event: "set/valve/status/request",
+  //     data: { name, value },
+  //   });
+  // };
 
-  const handleClickAvtomate = (name, value) => {
-    send({
-      event: "set/avtomat/status/request",
-      data: { name, value },
-    });
-  };
+  // const handleClickAvtomate = (name, value) => {
+  //   send({
+  //     event: "set/avtomat/status/request",
+  //     data: { name, value },
+  //   });
+  // };
 
   return (
     <div>
-      <header className="text-center mb-4">
+      {/* <header className="text-center mb-4">
         <Back></Back>
         <h1 className="display-3"> Управление</h1>
       </header>
       <div>
         <div className="row row-cols-1 row-cols-sm-1 row-cols-md-1 g-2">
-          {/* Насосы  */}
           <div className="col mb-3">
             <div className="card align-items-center border-0">
               <div className="card-body">
@@ -126,8 +124,6 @@ function Pampes() {
         </div>
 
         <div className="row row-cols-1 row-cols-sm-3 row-cols-md-3 g-2">
-          {/* Насосы  */}
-
           {pamps.map(({ name, value }, i) => (
             <div className="col" key={i}>
               <div className="card align-items-center pt-2 border-0">
@@ -172,7 +168,6 @@ function Pampes() {
         </div>
 
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mt-3 mb-5">
-          {/* Клапаны  */}
           {valves.map(({ name, status }, i) => (
             <div className="col" key={i}>
               <div className="card align-items-center border-0">
@@ -215,7 +210,7 @@ function Pampes() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

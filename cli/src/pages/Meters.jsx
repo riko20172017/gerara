@@ -1,45 +1,44 @@
 import React, { useContext, useState, useEffect } from "react";
-import WebSocketContext from "../websocket/WebSocketContext";
 import Meter from "../components/Meter/meter";
 import Back from "../components/gui/Back/Back";
 import { Link } from "react-router-dom";
 
 export default function Meters() {
-  const { send, message, readyState } = useContext(WebSocketContext);
-  const [meters, setMeters] = useState([]);
+  // const { send, message, readyState } = useContext(WebSocketContext);
+  // const [meters, setMeters] = useState([]);
 
-  // Handle WebSocket connection state
-  useEffect(() => {
-    if (readyState === 1) {
-      send({
-        event: "get/meters/data/request",
-      });
-    }
-  }, [readyState]);
+  // // Handle WebSocket connection state
+  // useEffect(() => {
+  //   if (readyState === 1) {
+  //     send({
+  //       event: "get/meters/data/request",
+  //     });
+  //   }
+  // }, [readyState]);
 
-  // Handle incoming WebSocket messages
-  useEffect(() => {
-    if (message) {
-      if (message.event === "get/meters/data/response") {
-        setMeters([...message.data]);
-      }
-    }
-  }, [message]);
+  // // Handle incoming WebSocket messages
+  // useEffect(() => {
+  //   if (message) {
+  //     if (message.event === "get/meters/data/response") {
+  //       setMeters([...message.data]);
+  //     }
+  //   }
+  // }, [message]);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (readyState === 1) {
-        send({
-          event: "get/meters/data/request",
-        });
-      }
-    }, 10000);
-    return () => clearInterval(intervalId);
-  }, []);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     if (readyState === 1) {
+  //       send({
+  //         event: "get/meters/data/request",
+  //       });
+  //     }
+  //   }, 10000);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   return (
     <div className="py-4">
-      <div className="row">
+      {/* <div className="row">
         <div className="col-12 col-sm-1">
           <Back></Back>
         </div>
@@ -61,7 +60,7 @@ export default function Meters() {
             </Link>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -5,11 +5,13 @@ module.exports = (broker, wss, db) => {
     ws.on("error", console.error);
 
     ws.on("message", function message(r) {
-      const e = JSON.parse(r).event;
+      const e = JSON.parse(r).action;
       const response = JSON.parse(r).data;
 
+      console.log(e)
+
       switch (e) {
-        case "get/valves/request":
+        case "get_valves":
           getValvesData(ws);
           break;
         case "set/valve/time/request":
@@ -241,7 +243,7 @@ module.exports = (broker, wss, db) => {
       status,
     }));
 
-    ws.send(JSON.stringify({ event: "get/valves/response", data: valves }));
+    ws.send(JSON.stringify({ event: "valves", data: valves }));
   };
 
   const getPeriodsData = async (ws) => {
