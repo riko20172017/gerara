@@ -22,9 +22,8 @@ export const WebSocketProvider = ({ children }) => {
 
   const [data, setData] = useState({
     valves: [],
-    pressure: null,
-    humidity: null,
-    alerts: null,
+    pamps: {},
+    periods: [],
   });
 
   useEffect(() => {
@@ -33,6 +32,12 @@ export const WebSocketProvider = ({ children }) => {
     switch (message.event) {
       case "valves":
         setData((prev) => ({ ...prev, valves: message.data }));
+        break;
+      case "pamps":
+        setData((prev) => ({ ...prev, pamps: message.data }));
+        break;
+      case "periods":
+        setData((prev) => ({ ...prev, periods: message.data }));
         break;
 
       default:

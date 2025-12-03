@@ -4,98 +4,78 @@ module.exports = (broker, wss, db) => {
   wss.on("connection", function connection(ws) {
     ws.on("error", console.error);
 
-    ws.on("message", function message(r) {
-      const e = JSON.parse(r).action;
-      const response = JSON.parse(r).data;
+    ws.on("message", function message(response) {
+      const parsed = JSON.parse(response);
+      const { action, data } = parsed;
 
-      console.log(e)
-
-      switch (e) {
+      switch (action) {
         case "get_valves":
-          getValvesData(ws);
+          getValves(ws);
           break;
-        case "set/valve/time/request":
-          broker.publish(
-            "vk" + response.name,
-            response.time,
-            options,
-            errorHandler
-          );
+        case "set_valve":
+          broker.publish("vk" + data.name, data.time, options, errorHandler);
           break;
         case "get/meters/data/request":
           getMetersData(ws);
           break;
         case "get/meter/request":
-          getMeterData(ws, response);
+          getMeterData(ws, data);
           break;
-        case "set/periods/number":
-          broker.publish("k.p", response, options, errorHandler);
+        case "set_periods":
+          broker.publish("k.p", data, options, errorHandler);
           break;
-        case "get/periods/request":
+        case "get_periods":
           getPeriodsData(ws);
           break;
-        case "set/period/request":
+        case "set_period":
           broker.publish(
-            "p" + response.name,
-            response.value.replace(":", ""),
+            "p" + data.name,
+            data.value.replace(":", ""),
             options,
             errorHandler
           );
           break;
-        case "get/pamps/request":
+        case "get_pamps":
           getPamps(ws);
           break;
-        case "set/pamp/request":
-          let data = "";
-          switch (response.name) {
+        case "set_pamp":
+          let topic = "";
+          switch (data.name) {
             case "1":
-              response.value === "on" ? (data = "b11") : (data = "b22");
+              data.value === "on" ? (topic = "b11") : (topic = "b22");
               break;
             case "2":
-              response.value === "on" ? (data = "b31") : (data = "b42");
+              data.value === "on" ? (topic = "b31") : (topic = "b42");
               break;
             case "3":
-              response.value === "on" ? (data = "b51") : (data = "b62");
+              data.value === "on" ? (topic = "b51") : (topic = "b62");
               break;
           }
-          broker.publish("nasos" + response.name, data, options, errorHandler);
+          broker.publish("nasos" + data.name, topic, options, errorHandler);
           break;
-        case "set/valve/status/request":
+        case "set_valve_status":
           let valveData = "";
-          switch (response.name) {
+          switch (data.name) {
             case "1":
-              response.value === "on"
-                ? (valveData = "k11")
-                : (valveData = "k22");
+              data.value === "on" ? (valveData = "k11") : (valveData = "k22");
               break;
             case "2":
-              response.value === "on"
-                ? (valveData = "k31")
-                : (valveData = "k42");
+              data.value === "on" ? (valveData = "k31") : (valveData = "k42");
               break;
             case "3":
-              response.value === "on"
-                ? (valveData = "k51")
-                : (valveData = "k62");
+              data.value === "on" ? (valveData = "k51") : (valveData = "k62");
               break;
             case "4":
-              response.value === "on"
-                ? (valveData = "k71")
-                : (valveData = "k82");
+              data.value === "on" ? (valveData = "k71") : (valveData = "k82");
               break;
           }
-          broker.publish(
-            "valve" + response.name,
-            valveData,
-            options,
-            errorHandler
-          );
+          broker.publish("valve" + data.name, valveData, options, errorHandler);
           break;
         case "get/avtomat/request":
           getAvtomat(ws);
           break;
-        case "set/avtomat/status/request":
-          broker.publish("aru", response.value, options, errorHandler);
+        case "set_avtomat":
+          broker.publish("aru", data.value, options, errorHandler);
           break;
       }
     });
@@ -235,15 +215,19 @@ module.exports = (broker, wss, db) => {
     ws.send(JSON.stringify({ event: "get/meter/response", data }));
   };
 
-  const getValvesData = async (ws) => {
+  const getValves = async (ws) => {
+    const valves = await _getValves();
+
+    ws.send(JSON.stringify({ event: "valves", data: valves }));
+  };
+
+  const _getValves = async (ws) => {
     const data = await db.collection("valves").find().toArray();
-    const valves = data.map(({ name, time, status }) => ({
+    return data.map(({ name, time, status }) => ({
       name,
       time,
       status,
     }));
-
-    ws.send(JSON.stringify({ event: "valves", data: valves }));
   };
 
   const getPeriodsData = async (ws) => {
@@ -255,18 +239,30 @@ module.exports = (broker, wss, db) => {
       }),
     };
 
-    ws.send(JSON.stringify({ event: "get/periods/response", data }));
+    ws.send(JSON.stringify({ event: "periods", data }));
   };
 
   const getPamps = async (ws) => {
-    let data = await db.collection("pamps").find().toArray();
-    data = data.map(({ name, value }) => ({ name, value }));
+    const pamps = await _getPamps();
+    const valves = await _getValves();
+    const avtomat = await _getAvtomat();
 
-    ws.send(JSON.stringify({ event: "get/pamps/response", data }));
+    ws.send(
+      JSON.stringify({
+        event: "pamps",
+        data: { pamps, valves, avtomat },
+      })
+    );
+  };
+
+  const _getPamps = async (ws) => {
+    const pamps = await db.collection("pamps").find().toArray();
+    return pamps.map(({ name, value }) => ({ name, value }));
   };
 
   const getAvtomat = async (ws) => {
-    const data = await db.collection("avtomat").findOne();
+    const avtomat = await db.collection("avtomat").findOne();
+
     ws.send(
       JSON.stringify({
         event: "get/avtomat/response",
@@ -276,6 +272,11 @@ module.exports = (broker, wss, db) => {
         },
       })
     );
+  };
+
+  const _getAvtomat = async (ws) => {
+    const avtomat = await db.collection("avtomat").findOne();
+    return { name: avtomat.name, status: avtomat.status };
   };
 
   function errorHandler(error) {

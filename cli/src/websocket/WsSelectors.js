@@ -3,7 +3,9 @@ import WebSocketContext from "./WebSocketContext";
 
 export const useValves = () => useContext(WebSocketContext).valves;
 
-export const usePressure = () => useContext(WebSocketContext).pressure;
+export const usePamps = () => useContext(WebSocketContext).pamps;
+
+export const usePeriods = () => useContext(WebSocketContext).periods;
 
 export const useHumidity = () => useContext(WebSocketContext).humidity;
 

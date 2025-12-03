@@ -11,36 +11,21 @@ function Valves() {
   //Handle WebSocket connection state
   useEffect(() => {
     if (ready) {
-      send({ action: "get_valves" });
+      const timerId = setInterval(() => {
+        send({ action: "get_valves" });
+      }, 1000);
+      return () => {
+        clearTimeout(timerId);
+      };
     }
-  }, [send, ready]);
-
-  // //Handle incoming WebSocket messages
-  // useEffect(() => {
-  //   if (message && message.event && message.data) {
-  //     const { event, data } = message;
-  //     if (event === "get/valves/response") setValves([...data]); // Assuming the response is an array of objects
-  //     if (event === "valve/time") {
-  //       const nextValves = valves.map((v, i) => {
-  //         if (v.name === data.name) {
-  //           return data;
-  //         } else {
-  //           return v;
-  //         }
-  //       });
-  //       setValves(nextValves);
-  //     }
-  //   }
-  // }, [message]);
+  });
 
   const handleClick = (name, time) => {
     send({
-      event: "set/valve/time/request",
+      action: "set_valve",
       data: { name, time },
     });
   };
-
-  console.log('1')
 
   return (
     <div>
