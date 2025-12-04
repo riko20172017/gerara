@@ -35,7 +35,7 @@ async function setup() {
     setupWebSocket(mqttClient, wss, db) ; // инициализируем WebSocket
     server.listen(7000);
   } catch (err) {
-    console.error("Ошибка подключения к MongoDB:", err);
+    console.error("Ошибка подключения к MongoDB");
   }
 }
 

@@ -15,11 +15,11 @@ module.exports = (broker, wss, db) => {
         case "set_valve":
           broker.publish("vk" + data.name, data.time, options, errorHandler);
           break;
-        case "get/meters/data/request":
-          getMetersData(ws);
+        case "get_meters":
+          getMeters(ws);
           break;
-        case "get/meter/request":
-          getMeterData(ws, data);
+        case "get_meter":
+          getMeter(ws, data);
           break;
         case "set_periods":
           broker.publish("k.p", data, options, errorHandler);
@@ -83,7 +83,7 @@ module.exports = (broker, wss, db) => {
 
   const params = { sort: { _id: -1 }, projection: { _id: 0 } };
 
-  const getMetersData = async (ws) => {
+  const getMeters = async (ws) => {
     const h = db.collection("m.humidity");
     const st = db.collection("m.soil-temperature");
     const at = db.collection("m.air-temperature");
@@ -193,10 +193,10 @@ module.exports = (broker, wss, db) => {
       },
     ];
 
-    ws.send(JSON.stringify({ event: "get/meters/data/response", data }));
+    ws.send(JSON.stringify({ event: "meters", data }));
   };
 
-  const getMeterData = async (ws, response) => {
+  const getMeter = async (ws, response) => {
     const collectionName = response.type;
     const collection = db.collection(collectionName);
     const name = response.name;
@@ -206,13 +206,34 @@ module.exports = (broker, wss, db) => {
       data = await collection
         .find({ name: name })
         .sort({ _id: -1 }) // ← сортируем от новых к старым
-        .limit(10) // ← последние 10
+        .limit(50) // ← последние 10
         .toArray();
     } else {
-      data = await collection.find().sort({ _id: -1 }).limit(10).toArray();
+      data = await collection.find().sort({ _id: -1 }).limit(50).toArray();
     }
 
-    ws.send(JSON.stringify({ event: "get/meter/response", data }));
+    const result = data.map((doc) => ({
+      value: doc.value,
+      createdAt: doc._id.getTimestamp().toLocaleDateString("ru-RU", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }), // Date объект
+      createdAtISO: doc._id.getTimestamp().toISOString(), // Строка в ISO формате
+      createdAtLocale: doc._id.getTimestamp().toLocaleString(), // Локализованная строка
+    }));
+
+    const values = result.map((item) => item.value);
+    const times = result.map((item) => item.createdAt);
+
+    ws.send(
+      JSON.stringify({
+        event: "meter",
+        data: { values, times },
+      })
+    );
   };
 
   const getValves = async (ws) => {

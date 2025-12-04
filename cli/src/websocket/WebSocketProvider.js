@@ -24,6 +24,8 @@ export const WebSocketProvider = ({ children }) => {
     valves: [],
     pamps: {},
     periods: [],
+    meters: [],
+    meter: {},
   });
 
   useEffect(() => {
@@ -38,6 +40,12 @@ export const WebSocketProvider = ({ children }) => {
         break;
       case "periods":
         setData((prev) => ({ ...prev, periods: message.data }));
+        break;
+      case "meters":
+        setData((prev) => ({ ...prev, meters: message.data }));
+        break;
+      case "meter":
+        setData((prev) => ({ ...prev, meter: message.data }));
         break;
 
       default:

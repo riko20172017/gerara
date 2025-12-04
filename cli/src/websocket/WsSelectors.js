@@ -7,9 +7,9 @@ export const usePamps = () => useContext(WebSocketContext).pamps;
 
 export const usePeriods = () => useContext(WebSocketContext).periods;
 
-export const useHumidity = () => useContext(WebSocketContext).humidity;
+export const useMeters = () => useContext(WebSocketContext).meters;
 
-export const useAlerts = () => useContext(WebSocketContext).alerts;
+export const useMeter = () => useContext(WebSocketContext).meter;
 
 export const useWSSend = () => useContext(WebSocketContext).send;
 
