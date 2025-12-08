@@ -18,7 +18,7 @@ function Valves() {
         clearTimeout(timerId);
       };
     }
-  });
+  }, [ready]);
 
   const handleClick = (name, time) => {
     send({

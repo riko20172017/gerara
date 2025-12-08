@@ -19,7 +19,7 @@ function Pampes() {
         clearTimeout(timerId);
       };
     }
-  });
+  }, [ready]);
 
   const handleClickPamp = (name, value) => {
     send({

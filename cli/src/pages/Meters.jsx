@@ -12,6 +12,7 @@ export default function Meters() {
   //Handle WebSocket connection state
   useEffect(() => {
     if (ready) {
+      send({ action: "get_meters" });
       const timerId = setInterval(() => {
         send({ action: "get_meters" });
       }, 10000);
@@ -19,7 +20,7 @@ export default function Meters() {
         clearTimeout(timerId);
       };
     }
-  });
+  }, [ready]);
 
   return (
     <div className="py-4">

@@ -1,69 +1,59 @@
-import React, { useContext, useState, useEffect } from "react";
-// import WebSocketContext from "../websocket/WebSocketContext";
+import React, { useEffect } from "react";
 import Back from "../components/gui/Back/Back";
+import { usePamps, useReady, useWSSend } from "../websocket/WsSelectors";
 
 function Areas() {
-  // const { send, message, readyState } = useContext(WebSocketContext);
-  // const [periods, setPeriods] = useState({ length: 0, periods: [] });
+  const pamps = usePamps();
+  const send = useWSSend();
+  const ready = useReady();
 
-  // // Handle WebSocket connection state
-  // useEffect(() => {
-  //   if (readyState === 1) {
-  //     send({
-  //       event: "get/periods/request",
-  //     });
-  //   }
-  // }, [readyState]);
+  //Handle WebSocket connection state
+  useEffect(() => {
+    if (ready) {
+      send({ action: "get_pamps" });
+      const timerId = setInterval(() => {
+        send({ action: "get_pamps" });
+      }, 1000);
+      return () => {
+        clearTimeout(timerId);
+      };
+    }
+  }, [ready]);
 
-  // //Handle incoming WebSocket messages
-  // useEffect(() => {
-  //   if (message && message.event && message.data) {
-  //     const { event, data } = message;
-  //     if (event === "periods/number") {
-  //       setPeriods((prev) => ({
-  //         ...prev,
-  //         length: data,
-  //       }));
-  //     }
-
-  //     if (event === "get/periods/response") {
-  //       setPeriods(data);
-  //     }
-
-  //     if (event === "set/period/response") {
-  //       setPeriods((prev) => ({
-  //         ...prev,
-  //         periods: prev.periods.map((period) =>
-  //           period.name === data.name
-  //             ? { ...period, value: data.value }
-  //             : period
-  //         ),
-  //       }));
-  //     }
-  //   }
-  // }, [message]);
-
-  // const handlePeriodLength = (name, value) => {
-  //   send({
-  //     event: "set/periods/number",
-  //     data: value,
-  //   });
-  // };
-
-  // const handlePeriods = (name, value) => {
-  //   send({
-  //     event: "set/period/request",
-  //     data: { name, value },
-  //   });
-  // };
+  const filename = pamps?.valves
+    ?.map(({ name, status }, index) => {
+      if (status === "on") {
+        return name;
+      } else {
+        return 0;
+      }
+    })
+    .reverse()
+    .join("");
 
   return (
     <div>
-      <header className="text-center mb-4">
-        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center text-light gap-1">
-          <Back></Back>
+      <div className="container mt-3">
+        <div className="py-4">
+          <div className="row">
+            <div className="col-12 col-sm-1">
+              <Back></Back>
+            </div>
+            <div className="col-12 col-sm-11">
+              <h1 class="display-6 text-center">Display 6</h1>
+            </div>
+          </div>
+          <div className="row g-4">
+            <div className="col">
+              <img
+                className="img-fluid"
+                src={process.env.PUBLIC_URL + `/img/${filename}.png`}
+                alt=""
+              />
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
     </div>
   );
 }

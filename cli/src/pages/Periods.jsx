@@ -18,7 +18,7 @@ function Valves() {
         clearTimeout(timerId);
       };
     }
-  });
+  }, [ready]);
 
   const handlePeriodLength = (name, value) => {
     send({
