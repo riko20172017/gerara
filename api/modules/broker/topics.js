@@ -8,7 +8,7 @@ module.exports = [
   "vk2o",
   "vk3o",
   "vk4o",
-  "k.p",
+  "k.po",
   "p1o",
   "p2o",
   "p3o",

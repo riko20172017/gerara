@@ -4,10 +4,14 @@ services:
       context: ./cli
       dockerfile: Dockerfile
       target: production
-    image: riko2018/iot-cli
+      args:
+        - ENVIRONMENT=remote
+    image: riko2018/gerara-cli
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
       target: production
-    image: riko2018/iot-api
+      args:
+        - ENVIRONMENT=remote
+    image: riko2018/gerara-api

@@ -4,63 +4,78 @@ module.exports = (broker, wss, db) => {
   wss.on("connection", function connection(ws) {
     ws.on("error", console.error);
 
-    ws.on("message", function message(r) {
-      const e = JSON.parse(r).event;
-      const response = JSON.parse(r).data;
+    ws.on("message", function message(response) {
+      const parsed = JSON.parse(response);
+      const { action, data } = parsed;
 
-      switch (e) {
-        case "get/valves/request":
-          getValvesData(ws);
+      switch (action) {
+        case "get_valves":
+          getValves(ws);
           break;
-        case "set/valve/time/request":
-          broker.publish(
-            "vk" + response.name,
-            response.time,
-            options,
-            errorHandler
-          );
+        case "set_valve":
+          broker.publish("vk" + data.name, data.time, options, errorHandler);
           break;
-        case "get/meters/data/request":
-          getMetersData(ws);
+        case "get_meters":
+          getMeters(ws);
           break;
-        case "set/periods/number":
-          broker.publish("k.p", response, options, errorHandler);
+        case "get_meter":
+          getMeter(ws, data);
           break;
-        case "get/periods/request":
+        case "set_periods":
+          broker.publish("k.p", data, options, errorHandler);
+          break;
+        case "get_periods":
           getPeriodsData(ws);
           break;
-        case "set/period/request":
+        case "set_period":
           broker.publish(
-            "p" + response.name,
-            response.value.replace(":", ""),
+            "p" + data.name,
+            data.value.replace(":", ""),
             options,
             errorHandler
           );
           break;
-        case "get/pamps/request":
+        case "get_pamps":
           getPamps(ws);
           break;
-        case "set/pamp/request":
-          broker.publish(
-            "nasos" + response.name,
-            response.value,
-            options,
-            errorHandler
-          );
+        case "set_pamp":
+          let topic = "";
+          switch (data.name) {
+            case "1":
+              data.value === "on" ? (topic = "b11") : (topic = "b22");
+              break;
+            case "2":
+              data.value === "on" ? (topic = "b31") : (topic = "b42");
+              break;
+            case "3":
+              data.value === "on" ? (topic = "b51") : (topic = "b62");
+              break;
+          }
+          broker.publish("nasos" + data.name, topic, options, errorHandler);
           break;
-        case "set/valve/status/request":
-          broker.publish(
-            "valve" + response.name,
-            response.value,
-            options,
-            errorHandler
-          );
+        case "set_valve_status":
+          let valveData = "";
+          switch (data.name) {
+            case "1":
+              data.value === "on" ? (valveData = "k11") : (valveData = "k22");
+              break;
+            case "2":
+              data.value === "on" ? (valveData = "k31") : (valveData = "k42");
+              break;
+            case "3":
+              data.value === "on" ? (valveData = "k51") : (valveData = "k62");
+              break;
+            case "4":
+              data.value === "on" ? (valveData = "k71") : (valveData = "k82");
+              break;
+          }
+          broker.publish("valve" + data.name, valveData, options, errorHandler);
           break;
         case "get/avtomat/request":
           getAvtomat(ws);
           break;
-        case "set/avtomat/status/request":
-          broker.publish("aru", response.value, options, errorHandler);
+        case "set_avtomat":
+          broker.publish("aru", data.value, options, errorHandler);
           break;
       }
     });
@@ -68,7 +83,7 @@ module.exports = (broker, wss, db) => {
 
   const params = { sort: { _id: -1 }, projection: { _id: 0 } };
 
-  const getMetersData = async (ws) => {
+  const getMeters = async (ws) => {
     const h = db.collection("m.humidity");
     const st = db.collection("m.soil-temperature");
     const at = db.collection("m.air-temperature");
@@ -82,82 +97,158 @@ module.exports = (broker, wss, db) => {
     const data = [
       {
         ...(await st.findOne({}, params)),
-        name: "Температура почвы",
+        title: "Температура почвы",
+        type: st.collectionName,
+        name: "",
       },
       {
         ...(await at.findOne({}, params)),
-        name: "Температура воздуха",
+        title: "Температура воздуха",
+        type: at.collectionName,
+        name: "",
       },
       {
         ...(await ah.findOne({}, params)),
-        name: "Влажность воздуха",
+        title: "Влажность воздуха",
+        type: ah.collectionName,
+        name: "",
       },
       {
         ...(await wf.findOne({ name: "4" }, params)),
-        name: "Расход воды клапан 4",
+        title: "Расход воды клапан 4",
+        type: wf.collectionName,
+        name: "4",
       },
       {
         ...(await wf.findOne({ name: "3" }, params)),
-        name: "Расход воды клапан 3",
+        title: "Расход воды клапан 3",
+        type: wf.collectionName,
+        name: "3",
       },
       {
         ...(await wf.findOne({ name: "2" }, params)),
-        name: "Расход воды клапан 2",
+        title: "Расход воды клапан 2",
+        type: wf.collectionName,
+        name: "2",
       },
       {
         ...(await wf.findOne({ name: "1" }, params)),
-        name: "Расход воды клапан 1",
+        title: "Расход воды клапан 1",
+        type: wf.collectionName,
+        name: "1",
       },
       {
         ...(await pp.findOne({}, params)),
-        name: "Давление после насосов",
+        title: "Давление после насосов",
+        type: pp.collectionName,
+        name: "",
       },
       {
         ...(await fp.findOne({}, params)),
-        name: "Давление после фильтров",
+        title: "Давление после фильтров",
+        type: fp.collectionName,
+        name: "",
       },
       {
         ...(await ec.findOne({}, params)),
-        name: "EC",
+        title: "EC",
+        type: ec.collectionName,
+        name: "",
       },
       {
         ...(await ph.findOne({}, params)),
-        name: "PH",
+        title: "PH",
+        type: ph.collectionName,
+        name: "",
       },
       {
         ...(await h.findOne({ name: "1" }, params)),
-        name: "Влажность почвы 1",
+        title: "Влажность почвы 1",
+        type: h.collectionName,
+        name: "1",
       },
       {
         ...(await h.findOne({ name: "2" }, params)),
-        name: "Влажность почвы 2",
+        title: "Влажность почвы 2",
+        type: h.collectionName,
+        name: "2",
       },
       {
         ...(await h.findOne({ name: "3" }, params)),
-        name: "Влажность почвы 3",
+        title: "Влажность почвы 3",
+        type: h.collectionName,
+        name: "3",
       },
       {
         ...(await h.findOne({ name: "4" }, params)),
-        name: "Влажность почвы 4",
+        title: "Влажность почвы 4",
+        type: h.collectionName,
+        name: "4",
       },
       {
         ...(await h.findOne({ name: "5" }, params)),
-        name: "Влажность почвы 5",
+        title: "Влажность почвы 5",
+        type: h.collectionName,
+        name: "5",
       },
     ];
 
-    ws.send(JSON.stringify({ event: "get/meters/data/response", data }));
+    ws.send(JSON.stringify({ event: "meters", data }));
   };
 
-  const getValvesData = async (ws) => {
+  const getMeter = async (ws, response) => {
+    const collectionName = response.type;
+    const collection = db.collection(collectionName);
+    const name = response.name;
+    let data = [];
+
+    if (name !== "-1") {
+      data = await collection
+        .find({ name: name })
+        .sort({ _id: -1 }) // ← сортируем от новых к старым
+        .limit(50) // ← последние 10
+        .toArray();
+    } else {
+      data = await collection.find().sort({ _id: -1 }).limit(50).toArray();
+    }
+
+    const result = data.map((doc) => ({
+      value: doc.value,
+      createdAt: doc._id.getTimestamp().toLocaleDateString("ru-RU", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }), // Date объект
+      createdAtISO: doc._id.getTimestamp().toISOString(), // Строка в ISO формате
+      createdAtLocale: doc._id.getTimestamp().toLocaleString(), // Локализованная строка
+    }));
+
+    const values = result.map((item) => item.value);
+    const times = result.map((item) => item.createdAt);
+
+    ws.send(
+      JSON.stringify({
+        event: "meter",
+        data: { values, times },
+      })
+    );
+  };
+
+  const getValves = async (ws) => {
+    const valves = await _getValves();
+
+    ws.send(JSON.stringify({ event: "valves", data: valves }));
+  };
+
+  const _getValves = async (ws) => {
     const data = await db.collection("valves").find().toArray();
-    const valves = data.map(({ name, time, status }) => ({
+    return data.map(({ name, time, status }) => ({
       name,
       time,
       status,
     }));
-
-    ws.send(JSON.stringify({ event: "get/valves/response", data: valves }));
   };
 
   const getPeriodsData = async (ws) => {
@@ -169,18 +260,30 @@ module.exports = (broker, wss, db) => {
       }),
     };
 
-    ws.send(JSON.stringify({ event: "get/periods/response", data }));
+    ws.send(JSON.stringify({ event: "periods", data }));
   };
 
   const getPamps = async (ws) => {
-    let data = await db.collection("pamps").find().toArray();
-    data = data.map(({ name, value }) => ({ name, value }));
+    const pamps = await _getPamps();
+    const valves = await _getValves();
+    const avtomat = await _getAvtomat();
 
-    ws.send(JSON.stringify({ event: "get/pamps/response", data }));
+    ws.send(
+      JSON.stringify({
+        event: "pamps",
+        data: { pamps, valves, avtomat },
+      })
+    );
+  };
+
+  const _getPamps = async (ws) => {
+    const pamps = await db.collection("pamps").find().toArray();
+    return pamps.map(({ name, value }) => ({ name, value }));
   };
 
   const getAvtomat = async (ws) => {
-    const data = await db.collection("avtomat").findOne();
+    const avtomat = await db.collection("avtomat").findOne();
+
     ws.send(
       JSON.stringify({
         event: "get/avtomat/response",
@@ -190,6 +293,11 @@ module.exports = (broker, wss, db) => {
         },
       })
     );
+  };
+
+  const _getAvtomat = async (ws) => {
+    const avtomat = await db.collection("avtomat").findOne();
+    return { name: avtomat.name, status: avtomat.status };
   };
 
   function errorHandler(error) {

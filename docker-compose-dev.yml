@@ -1,0 +1,69 @@
+services:
+  mongo:
+    hostname: mongo
+    ports:
+      - "27017:27017"
+    image: mongo
+    container_name: mongo-dev
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - mongo:/data/db
+
+  db:
+    hostname: db
+    image: mysql:8.0
+    container_name: mysql-dev
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=wordpress
+    volumes:
+      - dbdata:/var/lib/mysql
+    command: "--default-authentication-plugin=mysql_native_password"
+
+  wp:
+    hostname: wp
+    depends_on:
+      - db
+    image: wordpress
+    container_name: wp-dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_USER=$MYSQL_USER
+      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+      - WORDPRESS_DB_NAME=wordpress
+      - WP_HOME=https://localhost
+      - WP_SITEURL=https://localhost
+    volumes:
+      - wordpress:/var/www/html
+      - ./wp/wp-config.php:/var/www/html/wp-config.php
+
+  web:
+    hostname: web
+    depends_on:
+      - wp
+    image: nginx:1.15.12-alpine
+    container_name: web-dev
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./web/nginx-conf-dev:/etc/nginx/conf.d
+      - ./web/certs:/etc/ssl/private
+
+volumes:
+  mongo:
+  api:
+  wordpress:
+  dbdata:
+  certs:

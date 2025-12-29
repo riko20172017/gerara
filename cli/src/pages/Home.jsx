@@ -18,6 +18,9 @@ const Home = () => {
           <li>
             <Link to="/app/meters">Датчики</Link>
           </li>
+          <li>
+            <Link to="/app/areas">Площадь и сорта яблок</Link>
+          </li>
         </ul>
       </nav>
 

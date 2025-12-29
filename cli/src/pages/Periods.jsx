@@ -1,59 +1,35 @@
-import React, { useContext, useState, useEffect } from "react";
-import WebSocketContext from "../websocket/WebSocketContext";
+import React, { useEffect } from "react";
 import InputTimer from "../components/InputTimer";
 import Back from "../components/gui/Back/Back";
+import { usePeriods, useWSSend, useReady } from "../websocket/WsSelectors";
 
 function Valves() {
-  const { send, message, readyState } = useContext(WebSocketContext);
-  const [periods, setPeriods] = useState({ length: 0, periods: [] });
+  const periods = usePeriods();
+  const send = useWSSend();
+  const ready = useReady();
 
-  // Handle WebSocket connection state
+  //Handle WebSocket connection state
   useEffect(() => {
-    if (readyState === 1) {
-      send({
-        event: "get/periods/request",
-      });
+    if (ready) {
+      const timerId = setInterval(() => {
+        send({ action: "get_periods" });
+      }, 1000);
+      return () => {
+        clearTimeout(timerId);
+      };
     }
-  }, [readyState]);
-
-  //Handle incoming WebSocket messages
-  useEffect(() => {
-    if (message && message.event && message.data) {
-      const { event, data } = message;
-      if (event === "periods/number") {
-        setPeriods((prev) => ({
-          ...prev,
-          length: data,
-        }));
-      }
-
-      if (event === "get/periods/response") {
-        setPeriods(data);
-      }
-
-      if (event === "set/period/response") {
-        setPeriods((prev) => ({
-          ...prev,
-          periods: prev.periods.map((period) =>
-            period.name === data.name
-              ? { ...period, value: data.value }
-              : period
-          ),
-        }));
-      }
-    }
-  }, [message]);
+  }, [ready]);
 
   const handlePeriodLength = (name, value) => {
     send({
-      event: "set/periods/number",
+      action: "set_periods",
       data: value,
     });
   };
 
   const handlePeriods = (name, value) => {
     send({
-      event: "set/period/request",
+      action: "set_period",
       data: { name, value },
     });
   };
@@ -83,7 +59,7 @@ function Valves() {
         </div>
         <div className="col-12 col-sm-9">
           <ul className="text-light m-0 p-0">
-            {periods.periods.map(({ name, value }, index) => (
+            {periods?.periods?.map(({ name, value }, index) => (
               <li
                 key={index}
                 className="list-group-item d-flex flex-column align-items-center align-items-sm-stretch"

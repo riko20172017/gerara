@@ -1,0 +1,95 @@
+services:
+  cli:
+    image: riko2018/gerara-cli
+    container_name: cli
+  api:
+    image: riko2018/gerara-api
+    container_name: api
+    restart: always
+    ports:
+      - "8000:8000"
+      - "7000:7000"
+    depends_on:
+      broker:
+        condition: service_started
+      mongo:
+        condition: service_healthy
+  mongo:
+    ports:
+      - "27017:27017"
+    image: mongo
+    container_name: mongo
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - mongo:/data/db
+
+  broker:
+    container_name: broker
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+    volumes:
+      - ./broker/config:/mosquitto/config
+      - ./broker/data:/mosquitto/data
+      - ./broker/log:/mosquitto/log
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=wordpress
+    volumes:
+      - dbdata:/var/lib/mysql
+    command: "--default-authentication-plugin=mysql_native_password"
+
+  wp:
+    depends_on:
+      - db
+    image: wordpress
+    container_name: wp
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_USER=$MYSQL_USER
+      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+      - WORDPRESS_DB_NAME=wordpress
+      - WP_HOME=https://gerara.ru
+      - WP_SITEURL=https://gerara.ru
+    volumes:
+      - wordpress:/var/www/html
+      - ./wp/wp-config.php:/var/www/html/wp-config.php
+
+  web:
+    depends_on:
+      - wp
+      - api
+    # build:
+    #   context: ./web
+    #   dockerfile: Dockerfile
+    #   target: production
+    # image: riko2018/gerara-web
+    image: nginx
+    container_name: web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - ./web/nginx-conf-remote:/etc/nginx/conf.d
+
+volumes:
+  mongo:
+  wordpress:
+  dbdata:
+  certs:
+  certbot-etc:

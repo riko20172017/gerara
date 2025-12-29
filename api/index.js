@@ -1,7 +1,6 @@
-const fs = require('fs');
-const https = require('https');
-const express = require('express');
-const { WebSocketServer } = require('ws');
+const { WebSocketServer } = require("ws");
+const { createServer } = require("http");
+const express = require("express"); // подключаем фреймворк Express (модуль)
 const MongoClient = require("mongodb").MongoClient;
 const mqtt = require("mqtt");
 
@@ -9,39 +8,34 @@ const setupMqttClient = require("./modules/broker/broker.js");
 const mqttInits = require("./modules/broker/options.js");
 const setupWebSocket = require("./modules/socket/socket.js");
 
-const app = express();
+const server = createServer({ noServer: true });
 
-const server = https.createServer({
-  key: fs.readFileSync('/etc/letsencrypt/live/gerara.ru/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/gerara.ru/fullchain.pem')
-}, app);
+const MONGO_DOMEN =
+  process.env.ENVIRONMENT ? "mongo" : "localhost";
 
-// 🎯 WebSocket-сервер вручную
-const wss = new WebSocketServer({ port: 7000 });
+console.log(process.env.ENVIRONMENT)
 
 async function setup() {
   try {
-    const mongo = new MongoClient(`mongodb://mongo:27017/`);
+    const mongo = new MongoClient(`mongodb://${MONGO_DOMEN}:27017/`);
     const connection = await mongo.connect();
     const db = connection.db("gerara");
+    const wss = new WebSocketServer({ noServer: true });
+
+    server.on("upgrade", (req, socket, head) => {
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit("connection", ws, req);
+      });
+    });
 
     const mqttClient = mqtt.connect(mqttInits.url, mqttInits.options);
 
-    setupMqttClient(mqttClient, wss, db);
-    setupWebSocket(mqttClient, wss, db);
-
-    server.listen(8000, () => {
-      console.log('✅ HTTPS сервер слушает порт 8000');
-    });
-
+    setupMqttClient(mqttClient, wss, db); // инициализируем брокер mqtt
+    setupWebSocket(mqttClient, wss, db) ; // инициализируем WebSocket
+    server.listen(7000);
   } catch (err) {
-    console.error("Ошибка запуска:", err);
+    console.error("Ошибка подключения к MongoDB");
   }
 }
 
 setup();
-
-// Express-маршруты по желанию
-app.get("/", (req, res) => {
-  res.send("WebSocket-сервер работает");
-});

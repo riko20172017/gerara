@@ -7,8 +7,11 @@ import Valves from "./pages/Valves";
 import Meters from "./pages/Meters";
 import Periods from "./pages/Periods";
 import NoPage from "./pages/NoPage";
+import Areas from "./pages/Areas";
+import Meter from "./pages/Meter";
 
 function App() {
+  console.log(process.env.NODE_ENV)
   return (
     <BrowserRouter>
       <Routes>
@@ -17,7 +20,9 @@ function App() {
           <Route path="pamps" element={<Pamps />} />
           <Route path="valves" element={<Valves />} />
           <Route path="meters" element={<Meters />} />
+          <Route path="meter/:meterType/:meterName" element={<Meter />} />
           <Route path="periods" element={<Periods />} />
+          <Route path="areas" element={<Areas />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
