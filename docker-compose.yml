@@ -33,6 +33,7 @@ services:
     image: eclipse-mosquitto
     ports:
       - 1883:1883
+      - 19037:19037
     volumes:
       - ./broker/config:/mosquitto/config
       - ./broker/data:/mosquitto/data
