@@ -37,6 +37,7 @@ services:
       - ./broker/config:/mosquitto/config
       - ./broker/data:/mosquitto/data
       - ./broker/log:/mosquitto/log
+      - certbot-etc:/etc/letsencrypt
   db:
     image: mysql:8.0
     container_name: mysql
